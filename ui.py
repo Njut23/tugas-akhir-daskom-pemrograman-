@@ -1,9 +1,10 @@
 # ============================================================
 # ui.py  —  GUI Utama
 # Sistem Informasi Akademik Mahasiswa
-# CustomTkinter — Tema Putih Clean + Biru
+# CustomTkinter — Tema Putih Clean + Oranye
 # ============================================================
 
+from __future__ import annotations
 import customtkinter as ctk
 from tkinter import messagebox, ttk
 import tkinter as tk
@@ -11,38 +12,47 @@ import db
 import math
 
 # ============================================================
-# TEMA
+# TEMA & FONT
 # ============================================================
 
-ctk.set_appearance_mode("light")
+ctk.set_appearance_mode("dark")  # Mengubah ke mode gelap
 ctk.set_default_color_theme("blue")
 
+# Konfigurasi Font Teknis (Gaya Gambar Teknik) - Menggunakan Font Sistem Standar
+FONT_HEADER = ("Arial Black", 28, "bold")      # Font tebal & tegas untuk judul utama
+FONT_SUB    = ("Consolas", 14, "bold")         # Font monospace untuk sub-judul/header kecil
+FONT_TEKS   = ("Consolas", 12)                 # Font monospace standar untuk isi
+FONT_ANGKA  = ("Consolas", 13, "bold")         # Font monospace tebal untuk data angka
+
+# Tema Gelap dengan Aksen Oranye Gelap untuk Header
 C = {
-    "biru":        "#1D4ED8",
-    "biru_gelap":  "#1E3A8A",
-    "biru_muda":   "#EFF6FF",
-    "biru_aksen":  "#3B82F6",
-    "putih":       "#FFFFFF",
-    "abu_bg":      "#F8FAFC",
-    "abu_card":    "#F1F5F9",
-    "abu_border":  "#E2E8F0",
-    "teks":        "#0F172A",
-    "teks_sub":    "#64748B",
-    "hijau":       "#16A34A",
-    "hijau_muda":  "#DCFCE7",
-    "merah":       "#DC2626",
-    "merah_muda":  "#FEE2E2",
-    "kuning":      "#D97706",
-    "kuning_muda": "#FEF3C7",
-    "ungu":        "#7C3AED",
-    "ungu_muda":   "#F5F3FF",
+    "oranye":       "#F97316",
+    "oranye_gelap": "#C2410C",  # Oranye gelap untuk header
+    "oranye_muda":  "#FFEDD5",
+    "oranye_aksen": "#FB923C",
+    "putih":        "#FFFFFF",
+    "broken_white": "#2A2A2A",  # Warna tombol dalam mode gelap
+    "abu_bg":       "#1A1A1A",  # Background utama sangat gelap
+    "abu_card":     "#262626",  # Warna kartu sedikit lebih terang dari bg
+    "abu_content":  "#333333",  # Warna abu untuk kotak konten
+    "abu_border":   "#404040",  # Border gelap
+    "teks":         "#E5E5E5",  # Teks terang agar kontras dengan bg gelap
+    "teks_sub":     "#A3A3A3",  # Teks sekunder abu-abu terang
+    "hijau":        "#16A34A",
+    "hijau_muda":   "#DCFCE7",
+    "merah":        "#DC2626",
+    "merah_muda":   "#FEE2E2",
+    "kuning":       "#D97706",
+    "kuning_muda":  "#FEF3C7",
+    "ungu":         "#7C3AED",
+    "ungu_muda":    "#F5F3FF",
 }
 
-F_JUDUL   = ("Segoe UI", 22, "bold")
-F_SUBJUDUL= ("Segoe UI", 14, "bold")
-F_NORMAL  = ("Segoe UI", 11)
-F_KECIL   = ("Segoe UI", 9)
-F_MONO    = ("Consolas", 10)
+F_JUDUL   = ("Poppins", 26, "bold")
+F_SUBJUDUL= ("Poppins", 15, "bold")
+F_NORMAL  = ("Poppins", 12)
+F_KECIL   = ("Poppins", 10)
+F_MONO    = ("Consolas", 11)
 
 # ============================================================
 # HELPER
@@ -56,20 +66,21 @@ def _entry(parent, placeholder="", show="", width=280):
         font=F_NORMAL,
         corner_radius=8,
         border_color=C["abu_border"],
-        fg_color=C["putih"],
-        text_color=C["teks"],
+        fg_color=C["abu_content"],
+        text_color="#FFFFFF",
     )
 
 
 def _btn(parent, text, command, color=None, width=160, height=38):
-    color = color or C["biru"]
+    color = color or C["broken_white"]
     return ctk.CTkButton(
         parent, text=text, command=command,
         width=width, height=height,
-        font=("Segoe UI", 11, "bold"),
+        font=("Poppins", 11, "bold"),
         fg_color=color,
-        hover_color=_gelap(color),
-        corner_radius=8,
+        hover_color=C["oranye"],
+        corner_radius=10,
+        text_color="#FFFFFF",
     )
 
 
@@ -107,24 +118,24 @@ def _style_tree():
     s = ttk.Style()
     s.theme_use("clam")
     s.configure("App.Treeview",
-        background=C["putih"],
+        background=C["abu_content"],
         foreground=C["teks"],
-        fieldbackground=C["putih"],
-        rowheight=42,
-        font=("Segoe UI", 11),
+        fieldbackground=C["abu_content"],
+        rowheight=30,
+        font=("Consolas", 10),
         borderwidth=0,
     )
     s.configure("App.Treeview.Heading",
-        background=C["biru"],
+        background=C["oranye_gelap"],
         foreground=C["putih"],
-        font=("Segoe UI", 11, "bold"),
+        font=("Arial Black", 10, "bold"),
         borderwidth=0,
         relief="flat",
-        padding=(0, 10),
+        padding=(0, 8),
     )
     s.map("App.Treeview",
-        background=[("selected", C["biru_muda"])],
-        foreground=[("selected", C["biru"])]
+        background=[("selected", C["oranye_gelap"])],
+        foreground=[("selected", C["putih"])]
     )
 
 
@@ -164,14 +175,14 @@ class Chart:
         gap = 6
         bar_h = max(10, (chart_h - gap * (n + 1)) // n)
 
-        default_colors = [C["biru"], C["hijau"], C["kuning"], C["merah"],
-                          C["ungu"], C["biru_aksen"]] * 10
+        default_colors = [C["oranye"], C["hijau"], C["kuning"], C["merah"],
+                          C["ungu"], C["oranye_aksen"]] * 10
         colors = colors or default_colors
 
         # Title
         if title:
             canvas.create_text(PAD_L + chart_w // 2, 14, text=title,
-                               font=("Segoe UI", 9, "bold"),
+                               font=("Poppins", 9, "bold"),
                                fill=C["teks"], anchor="center")
 
         # Grid lines vertikal
@@ -184,7 +195,7 @@ class Chart:
             val_label = int(max_val * i / grid_steps)
             canvas.create_text(gx, PAD_T + chart_h + 10,
                                text=str(val_label),
-                               font=("Segoe UI", 7), fill=C["teks_sub"])
+                               font=("Poppins", 7), fill=C["teks_sub"])
 
         # Bar-bar
         for i, ((label, val), color) in enumerate(zip(data, colors)):
@@ -206,13 +217,13 @@ class Chart:
 
             # Label kiri
             canvas.create_text(PAD_L - 6, (y1 + y2) // 2,
-                               text=label, font=("Segoe UI", 8),
+                               text=label, font=("Poppins", 8),
                                fill=C["teks"], anchor="e")
 
             # Nilai di ujung bar
             if val > 0:
                 canvas.create_text(PAD_L + bar_len + 8, (y1 + y2) // 2,
-                                   text=str(val), font=("Segoe UI", 8, "bold"),
+                                   text=str(val), font=("Poppins", 8, "bold"),
                                    fill=color, anchor="w")
 
     @staticmethod
@@ -241,14 +252,14 @@ class Chart:
         gap = 8
         bar_w = max(12, (chart_w - gap * (n + 1)) // n)
 
-        default_colors = [C["biru"], C["hijau"], C["kuning"], C["merah"],
-                          C["ungu"], C["biru_aksen"]] * 10
+        default_colors = [C["oranye"], C["hijau"], C["kuning"], C["merah"],
+                          C["ungu"], C["oranye_aksen"]] * 10
         colors = colors or default_colors
 
         # Title
         if title:
             canvas.create_text(PAD_L + chart_w // 2, 14, text=title,
-                               font=("Segoe UI", 9, "bold"),
+                               font=("Poppins", 9, "bold"),
                                fill=C["teks"], anchor="center")
 
         # Grid lines horizontal
@@ -260,7 +271,7 @@ class Chart:
             val_label = int(max_val * i / grid_steps)
             canvas.create_text(PAD_L - 6, gy,
                                text=str(val_label),
-                               font=("Segoe UI", 7), fill=C["teks_sub"],
+                               font=("Poppins", 7), fill=C["teks_sub"],
                                anchor="e")
 
         # Sumbu X
@@ -282,14 +293,14 @@ class Chart:
 
             # Label bawah
             canvas.create_text((x1 + x2) // 2, PAD_T + chart_h + 12,
-                               text=label, font=("Segoe UI", 8),
+                               text=label, font=("Poppins", 8),
                                fill=C["teks"], anchor="n")
 
             # Nilai di atas bar
             if val > 0:
                 canvas.create_text((x1 + x2) // 2, y1 - 8,
                                    text=str(val),
-                                   font=("Segoe UI", 8, "bold"),
+                                   font=("Poppins", 8, "bold"),
                                    fill=color, anchor="s")
 
     @staticmethod
@@ -310,8 +321,8 @@ class Chart:
                                fill=C["teks_sub"], font=F_KECIL)
             return
 
-        default_colors = [C["biru"], C["hijau"], C["kuning"],
-                          C["merah"], C["ungu"], C["biru_aksen"]] * 10
+        default_colors = [C["oranye"], C["hijau"], C["kuning"],
+                          C["merah"], C["ungu"], C["oranye_aksen"]] * 10
         colors = colors or default_colors
 
         cx = W * 0.38
@@ -320,7 +331,7 @@ class Chart:
 
         if title:
             canvas.create_text(W // 2, 14, text=title,
-                               font=("Segoe UI", 9, "bold"),
+                               font=("Poppins", 9, "bold"),
                                fill=C["teks"], anchor="center")
 
         start = 0.0
@@ -344,7 +355,7 @@ class Chart:
                                     fill=color, outline="")
             canvas.create_text(lx + 18, ly + 6,
                                text=f"{label}  {val} ({pct:.1f}%)",
-                               font=("Segoe UI", 8), fill=C["teks"],
+                               font=("Poppins", 8), fill=C["teks"],
                                anchor="w")
             ly += 22
 
@@ -377,7 +388,7 @@ class Chart:
 
         if title:
             canvas.create_text(PAD_L + chart_w // 2, 14, text=title,
-                               font=("Segoe UI", 9, "bold"),
+                               font=("Poppins", 9, "bold"),
                                fill=C["teks"], anchor="center")
 
         # Grid
@@ -389,7 +400,7 @@ class Chart:
                                fill="#E2E8F0", width=1, dash=(3, 3))
             canvas.create_text(PAD_L - 6, gy,
                                text=f"{gval:.2f}",
-                               font=("Segoe UI", 7), fill=C["teks_sub"],
+                               font=("Poppins", 7), fill=C["teks_sub"],
                                anchor="e")
 
         # X labels
@@ -397,7 +408,7 @@ class Chart:
             for i, lbl in enumerate(labels):
                 gx = PAD_L + int(chart_w * i / (n - 1))
                 canvas.create_text(gx, PAD_T + chart_h + 12,
-                                   text=lbl, font=("Segoe UI", 8),
+                                   text=lbl, font=("Poppins", 8),
                                    fill=C["teks_sub"])
 
         # Lines & dots
@@ -428,7 +439,7 @@ class Chart:
             canvas.create_rectangle(lx - 90, ly, lx - 78, ly + 8,
                                     fill=color, outline="")
             canvas.create_text(lx - 72, ly + 4,
-                               text=s_label, font=("Segoe UI", 8),
+                               text=s_label, font=("Poppins", 8),
                                fill=C["teks"], anchor="w")
             ly += 16
 
@@ -440,6 +451,7 @@ class Chart:
 class Sidebar(ctk.CTkFrame):
 
     MENU = [
+        ("Beranda",         "beranda"),
         ("Dashboard",       "dashboard"),
         ("Data Mahasiswa",  "mahasiswa"),
         ("Input Nilai",     "nilai"),
@@ -449,8 +461,10 @@ class Sidebar(ctk.CTkFrame):
 
     def __init__(self, parent, on_navigate):
         super().__init__(parent,
-            width=220, corner_radius=0,
-            fg_color=C["biru_gelap"],
+            width=200, corner_radius=0,
+            fg_color=C["abu_content"],
+            border_width=1,
+            border_color=C["abu_border"],
         )
         self.pack_propagate(False)
         self._nav = on_navigate
@@ -459,65 +473,61 @@ class Sidebar(ctk.CTkFrame):
         self._build()
 
     def _build(self):
+        # Header dengan logo EXEL INDONESIAN ENGINEERING kecil
         logo_frame = ctk.CTkFrame(self, fg_color="transparent")
-        logo_frame.pack(fill="x", padx=20, pady=(28, 24))
+        logo_frame.pack(fill="x", padx=16, pady=(20, 16))
 
         ctk.CTkLabel(logo_frame,
-            text="ARION",
-            font=("Segoe UI", 20, "bold"),
-            text_color="#FFFFFF",
-        ).pack(anchor="w")
-        ctk.CTkLabel(logo_frame,
-            text="Automation Robotics Information Online Network\nPendidikan Teknik Otomasi Industri dan Robotika",
-            font=("Segoe UI", 8),
-            text_color="#93C5FD",
-            wraplength=180,
-        ).pack(anchor="w")
+            text="EXEL",
+            font=("Poppins", 18, "bold"),
+            text_color=C["oranye"],
+        ).pack(anchor="center")
 
-        ctk.CTkFrame(self, height=1, fg_color="#2D4A8A").pack(fill="x", padx=16)
+        ctk.CTkFrame(self, height=1, fg_color=C["abu_border"]).pack(fill="x", padx=16, pady=(8, 16))
 
         menu_frame = ctk.CTkFrame(self, fg_color="transparent")
-        menu_frame.pack(fill="x", padx=12, pady=16)
+        menu_frame.pack(fill="x", padx=12, pady=8)
 
         for label, key in self.MENU:
             b = ctk.CTkButton(
                 menu_frame,
                 text=label,
                 anchor="w",
-                width=196,
-                height=40,
-                font=("Segoe UI", 11),
-                fg_color="transparent",
-                hover_color="#2D4A8A",
-                text_color="#CBD5E1",
-                corner_radius=8,
+                width=172,
+                height=42,
+                font=("Poppins", 11),
+                fg_color=C["broken_white"],
+                hover_color=C["oranye_muda"],
+                text_color="#FFFFFF",
+                corner_radius=10,
                 command=lambda k=key: self._klik(k),
             )
-            b.pack(fill="x", pady=2)
+            b.pack(fill="x", pady=3)
             self._btns[key] = b
 
+        # Logout button di bawah
         ctk.CTkButton(
             self,
             text="Logout",
             anchor="w",
-            width=196,
-            height=40,
-            font=("Segoe UI", 11),
-            fg_color="transparent",
-            hover_color="#7F1D1D",
-            text_color="#FCA5A5",
-            corner_radius=8,
+            width=172,
+            height=42,
+            font=("Poppins", 11),
+            fg_color=C["merah_muda"],
+            hover_color=C["merah"],
+            text_color=C["merah"],
+            corner_radius=10,
             command=lambda: self._nav("logout"),
         ).pack(side="bottom", padx=12, pady=20, fill="x")
 
     def _klik(self, key: str):
         for k, b in self._btns.items():
-            b.configure(fg_color="transparent", text_color="#CBD5E1", font=("Segoe UI", 11))
+            b.configure(fg_color=C["broken_white"], text_color="#FFFFFF", font=("Poppins", 11))
         if key in self._btns:
             self._btns[key].configure(
-                fg_color=C["biru_aksen"],
+                fg_color=C["oranye"],
                 text_color="#FFFFFF",
-                font=("Segoe UI", 11, "bold"),
+                font=("Poppins", 11, "bold"),
             )
         self._aktif = key
         self._nav(key)
@@ -530,25 +540,113 @@ class Sidebar(ctk.CTkFrame):
 # HALAMAN DASAR
 # ============================================================
 
+class HalamanBeranda(ctk.CTkFrame):
+
+    def __init__(self, parent):
+        super().__init__(parent, corner_radius=0, fg_color=C["abu_bg"])
+        self._build()
+
+    def _build(self):
+        # Header
+        hdr = ctk.CTkFrame(self, fg_color=C["oranye_gelap"], corner_radius=0, height=70)
+        hdr.pack(fill="x")
+        hdr.pack_propagate(False)
+        
+        # Separator line di bagian atas header
+        ctk.CTkFrame(hdr, height=3, fg_color=C["oranye"], corner_radius=0).pack(fill="x", side="top")
+        
+        inner = ctk.CTkFrame(hdr, fg_color="transparent")
+        inner.pack(side="left", padx=28, pady=(10, 0))
+        
+        # Logo placeholder
+        logo_box = ctk.CTkFrame(inner, fg_color=C["oranye"], width=40, height=40, corner_radius=8)
+        logo_box.pack(side="left", padx=(0, 12))
+        logo_box.pack_propagate(False)
+        ctk.CTkLabel(logo_box, text="🏠", font=("Poppins", 20), text_color="#FFFFFF").place(relx=0.5, rely=0.5, anchor="center")
+        
+        ctk.CTkLabel(inner, text="Beranda", font=F_JUDUL, text_color="#FFFFFF").pack(anchor="w")
+        ctk.CTkLabel(inner, text="Selamat datang di sistem SIAK UPE", font=F_KECIL, text_color=C["oranye_muda"]).pack(anchor="w")
+
+        # Container utama dengan padding
+        container = ctk.CTkFrame(self, fg_color="transparent")
+        container.pack(fill="both", expand=True, padx=28, pady=20)
+
+        # Kotak Pengumuman Kuning
+        box_pengumuman = ctk.CTkFrame(container, fg_color=C["kuning"], corner_radius=12)
+        box_pengumuman.pack(fill="x", pady=(0, 20))
+        box_pengumuman.pack_propagate(False)
+        
+        # Header kecil di pojok kiri atas kotak kuning
+        header_pengumuman = ctk.CTkFrame(box_pengumuman, fg_color="transparent")
+        header_pengumuman.pack(anchor="nw", padx=20, pady=(15, 5))
+        ctk.CTkLabel(header_pengumuman, text="PENGUMUMAN", font=("Poppins", 14, "bold"), text_color="#FFFFFF").pack(anchor="w")
+        
+        # Isi pengumuman
+        isi_pengumuman = ctk.CTkFrame(box_pengumuman, fg_color="transparent")
+        isi_pengumuman.pack(anchor="nw", padx=20, pady=(0, 15))
+        
+        teks_pengumuman = [
+            "• Aplikasi ini dibuat untuk memenuhi tugas akhir mata kuliah dasar komputer dan pemrograman",
+            "• Seluruh kegiatan developing menghabiskan waktu 2 minggu penuh",
+            "• Salam hangat Exel Dwi Pandjaitan"
+        ]
+        
+        for line in teks_pengumuman:
+            ctk.CTkLabel(isi_pengumuman, text=line, font=("Poppins", 11), text_color="#FFFFFF", justify="left").pack(anchor="w", pady=2)
+
+        # Kotak Putih Selamat Datang
+        box_putih = ctk.CTkFrame(container, fg_color=C["abu_content"], corner_radius=12)
+        box_putih.pack(fill="x")
+        
+        # Header kecil di pojok kiri atas kotak putih
+        header_putih = ctk.CTkFrame(box_putih, fg_color="transparent")
+        header_putih.pack(anchor="nw", padx=20, pady=(15, 5))
+        ctk.CTkLabel(header_putih, text="SELAMAT DATANG", font=("Poppins", 14, "bold"), text_color=C["oranye"]).pack(anchor="w")
+        
+        # Isi kotak putih
+        isi_putih = ctk.CTkFrame(box_putih, fg_color="transparent")
+        isi_putih.pack(anchor="nw", padx=20, pady=(0, 15))
+        
+        judul_sambutan = "Selamat Datang di sistem Aplikasi SIAK Mahasiswa UPE Terintegrasi"
+        ctk.CTkLabel(isi_putih, text=judul_sambutan, font=("Poppins", 13, "bold"), text_color="#FFFFFF").pack(anchor="w", pady=(0, 10))
+        
+        teks_sambutan = (
+            "Sistem ini adalah satu satunya layanan akademik untuk mahasiswa UPE yang memuat seluruh aktifitas utama administrasi akademik yang antara lain berisi fitur-fitur berikut\n\n"
+            "Sistem ini menggunakan Single Sign On UPE sebagai fitur otentifikasi, dan dikembangkan dengan insfrastruktur internet sehingga dapat diakses di mana saja sesuai dengan kondisi dan kebutuhan."
+        )
+        ctk.CTkLabel(isi_putih, text=teks_sambutan, font=("Poppins", 11), text_color=C["teks_sub"], justify="left", wraplength=700).pack(anchor="w")
+
 class HalamanBase(ctk.CTkFrame):
 
     def __init__(self, parent):
         super().__init__(parent, corner_radius=0, fg_color=C["abu_bg"])
 
-    def _header(self, judul: str, subjudul: str = ""):
-        hdr = ctk.CTkFrame(self, fg_color=C["putih"], corner_radius=0, height=70)
+    def _header(self, judul: str, subjudul: str = "", show_logo: bool = False):
+        hdr = ctk.CTkFrame(self, fg_color=C["oranye_gelap"], corner_radius=0, height=70)
         hdr.pack(fill="x")
         hdr.pack_propagate(False)
+        
+        # Separator line di bagian atas header
+        ctk.CTkFrame(hdr, height=3, fg_color=C["oranye"], corner_radius=0).pack(fill="x", side="top")
+        
         inner = ctk.CTkFrame(hdr, fg_color="transparent")
-        inner.pack(side="left", padx=28, pady=12)
-        ctk.CTkLabel(inner, text=judul, font=F_JUDUL, text_color=C["teks"]).pack(anchor="w")
+        inner.pack(side="left", padx=28, pady=(10, 0))
+        
+        # Logo placeholder jika diminta
+        if show_logo:
+            logo_box = ctk.CTkFrame(inner, fg_color=C["oranye"], width=40, height=40, corner_radius=8)
+            logo_box.pack(side="left", padx=(0, 12))
+            logo_box.pack_propagate(False)
+            ctk.CTkLabel(logo_box, text="🎓", font=("Poppins", 20), text_color="#FFFFFF").place(relx=0.5, rely=0.5, anchor="center")
+        
+        ctk.CTkLabel(inner, text=judul, font=F_JUDUL, text_color="#FFFFFF").pack(anchor="w")
         if subjudul:
-            ctk.CTkLabel(inner, text=subjudul, font=F_KECIL, text_color=C["teks_sub"]).pack(anchor="w")
+            ctk.CTkLabel(inner, text=subjudul, font=F_KECIL, text_color=C["oranye_muda"]).pack(anchor="w")
         ctk.CTkFrame(self, height=1, fg_color=C["abu_border"]).pack(fill="x")
 
     def _card(self, parent, **kw):
         return ctk.CTkFrame(parent,
-            fg_color=C["putih"],
+            fg_color=C["abu_card"],  # Menggunakan abu_card untuk background yang lebih gelap
             corner_radius=12,
             border_width=1,
             border_color=C["abu_border"],
@@ -564,125 +662,212 @@ class HalamanDashboard(HalamanBase):
 
     def __init__(self, parent):
         super().__init__(parent)
-        self._header("Dashboard", "Selamat datang, Admin")
+        self._header("Dashboard", "Selamat datang, Pak/Ibu Dosen", show_logo=True)
+        
+        # Membuat scrollable frame untuk konten utama dashboard
+        self.scroll_frame = ctk.CTkScrollableFrame(self, fg_color="transparent")
+        self.scroll_frame.pack(fill="both", expand=True, padx=0, pady=0)
+        
         self._build()
 
     def _build(self):
-        row1 = ctk.CTkFrame(self, fg_color="transparent")
+        # Gunakan self.scroll_frame sebagai parent untuk semua konten
+        container = self.scroll_frame
+        
+        # === 4 KARTU STATISTIK (PALING ATAS) ===
+        row1 = ctk.CTkFrame(container, fg_color="transparent")
         row1.pack(fill="x", padx=28, pady=(20, 10))
+
+        # Fungsi helper untuk membuat card dengan background abu gelap
+        def _stat_card(parent):
+            return ctk.CTkFrame(parent, fg_color=C["abu_card"],
+                corner_radius=12, border_width=1, border_color=C["abu_border"])
 
         self._cards = {}
         specs = [
-            ("total",       "Total Mahasiswa",  C["biru"],   "orang terdaftar"),
+            ("total",       "Total Mahasiswa",  C["oranye"],   "orang terdaftar"),
             ("sudah_nilai", "Sudah Input Nilai", C["hijau"],  "mahasiswa"),
             ("rata_ipk",    "Rata-rata IPK",     C["kuning"], "dari 4.00"),
             ("belum_nilai", "Belum Input Nilai", C["merah"],  "mahasiswa"),
         ]
         for col, (key, label, warna, satuan) in enumerate(specs):
-            card = self._card(row1, height=130)
+            card = _stat_card(row1)
             card.grid(row=0, column=col, padx=6, sticky="nsew")
             card.grid_propagate(False)
             row1.columnconfigure(col, weight=1)
 
-            ctk.CTkFrame(card, width=5, fg_color=warna, corner_radius=0
-                ).place(x=0, y=0, relheight=1)
+            # Strip merah maroon di bagian atas
+            ctk.CTkFrame(card, height=6, fg_color="#800000", corner_radius=0
+                ).place(x=0, y=0, relwidth=1)
 
             ctk.CTkLabel(card, text=label,
-                font=("Segoe UI", 9), text_color=C["teks_sub"]
+                font=("Poppins", 9), text_color=C["teks_sub"]
             ).place(x=22, y=16)
 
             val_lbl = ctk.CTkLabel(card, text="0",
-                font=("Segoe UI", 34, "bold"), text_color=warna)
+                font=("Poppins", 34, "bold"), text_color=warna)
             val_lbl.place(x=22, y=38)
 
             ctk.CTkLabel(card, text=satuan,
-                font=("Segoe UI", 8), text_color=C["teks_sub"]
+                font=("Poppins", 8), text_color=C["teks_sub"]
             ).place(x=24, y=100)
 
             self._cards[key] = val_lbl
 
-        row2 = ctk.CTkFrame(self, fg_color="transparent")
-        row2.pack(fill="x", padx=28, pady=(0, 10))
+        # === KALENDER AKADEMIK (PENGGANTI AKTIVITAS TERBARU) ===
+        kalender_card = self._card(container)
+        kalender_card.pack(fill="x", expand=False, padx=28, pady=(0, 10))
+
+        hdr_row = ctk.CTkFrame(kalender_card, fg_color="transparent")
+        hdr_row.pack(fill="x", padx=20, pady=(14, 0))
+        ctk.CTkLabel(hdr_row, text="KALENDER AKADEMIK",
+            font=F_SUBJUDUL, text_color=C["oranye"]).pack(side="left")
+
+        content_frame = ctk.CTkFrame(kalender_card, fg_color="transparent")
+        content_frame.pack(fill="both", expand=True, padx=20, pady=(0, 14))
+
+        # Data Kalender
+        kalender_data = [
+            {
+                "judul": "1. SELEKSI NASIONAL SNBP",
+                "items": [
+                    ("Pengisian PDSS", "06 Dec - 03 Mar 2025"),
+                    ("Pendaftaran", "04-18 Feb 2025"),
+                    ("Pengumuman Kelulusan", "18 Mar 2025")
+                ]
+            },
+            {
+                "judul": "2. SELEKSI NASIONAL SNBT",
+                "items": [
+                    ("Pendaftaran", "11-27 Mar 2025"),
+                    ("Pelaksanaan Test UTBK", "23 Apr - 03 May 2025"),
+                    ("Pengumuman Kelulusan", "28 May 2025")
+                ]
+            },
+            {
+                "judul": "3. AKHIR PERKULIAHAN (UJIAN DAN PEMASUKAN NILAI)",
+                "items": [
+                    ("Ujian Tengah Semester (UTS)", "23-27 Oct 2025"),
+                    ("Ujian Akhir Semester", "26 Dec - 12 Jan 2026"),
+                    ("Pemeriksaan dan Pemasukan Nilai UAS", "08-12 Jan 2026"),
+                    ("Remedial dan Ujian Ulang", "08-12 Jan 2026"),
+                    ("Pemasukan Nilai Hasil Ujian Ulang", "08-16 Jan 2026"),
+                    ("Pemasukan Nilai P3K dan P3NK", "19-30 Dec 2025"),
+                    ("Pemasukan Nilai KKN", "26 Feb - 14 Mar 2026")
+                ]
+            }
+        ]
+
+        # Render Loop
+        for section in kalender_data:
+            # Judul Section
+            lbl_section = ctk.CTkLabel(
+                content_frame,
+                text=section["judul"],
+                font=("Arial Black", 11, "bold"),
+                text_color="#FFFFFF",
+                anchor="w"
+            )
+            lbl_section.pack(fill="x", pady=(10, 5))
+
+            # Items dalam section
+            for item_name, item_date in section["items"]:
+                row_frame = ctk.CTkFrame(content_frame, fg_color="transparent")
+                row_frame.pack(fill="x", padx=10, pady=1)
+
+                # Nama Kegiatan
+                lbl_name = ctk.CTkLabel(
+                    row_frame,
+                    text=f"- {item_name}",
+                    font=("Consolas", 10),
+                    text_color=C["teks_sub"],
+                    anchor="w"
+                )
+                lbl_name.pack(side="left")
+
+                # Tanggal
+                lbl_date = ctk.CTkLabel(
+                    row_frame,
+                    text=item_date,
+                    font=("Consolas", 10, "bold"),
+                    text_color=C["oranye"],
+                    anchor="e"
+                )
+                lbl_date.pack(side="right")
+            
+            # Garis pemisah tipis antar section besar
+            separator = ctk.CTkFrame(content_frame, height=1, fg_color=C["abu_border"])
+            separator.pack(fill="x", pady=(10, 0))
+
+        # === PERFORMA MAHASISWA (HEADER DI SEBELAH KIRI) ===
+        perform_frame = ctk.CTkFrame(container, fg_color="transparent")
+        perform_frame.pack(fill="x", padx=28, pady=(10, 0))
+        
+        ctk.CTkLabel(perform_frame, text="PERFORMA MAHASISWA",
+            font=("Poppins", 16, "bold"), text_color="#FFFFFF"
+        ).pack(side="left", pady=(0, 10))
+
+        # === MAHASISWA TERBAIK & CHART IPK (DI BAWAH HEADER PERFORMA, SEBELAH KIRI) ===
+        row2 = ctk.CTkFrame(container, fg_color="transparent")
+        row2.pack(fill="x", padx=28, pady=(0, 24))
         row2.columnconfigure(0, weight=2)
         row2.columnconfigure(1, weight=3)
 
-        info_card = self._card(row2, height=110)
+        info_card = self._card(row2, height=280)
         info_card.grid(row=0, column=0, padx=(0, 6), sticky="nsew")
         info_card.grid_propagate(False)
 
         ctk.CTkLabel(info_card, text="MAHASISWA TERBAIK",
-            font=("Segoe UI", 8, "bold"), text_color=C["teks_sub"]
+            font=("Poppins", 10, "bold"), text_color=C["teks_sub"]
         ).place(x=18, y=14)
         self._lbl_best = ctk.CTkLabel(info_card, text="belum ada data",
-            font=("Segoe UI", 13, "bold"), text_color=C["biru"])
-        self._lbl_best.place(x=18, y=34)
+            font=("Poppins", 16, "bold"), text_color=C["oranye"])
+        self._lbl_best.place(x=18, y=40)
         self._lbl_best_ipk = ctk.CTkLabel(info_card, text="",
-            font=("Segoe UI", 10), text_color=C["teks_sub"])
-        self._lbl_best_ipk.place(x=18, y=60)
+            font=("Poppins", 12), text_color=C["teks_sub"])
+        self._lbl_best_ipk.place(x=18, y=70)
 
         ctk.CTkFrame(info_card, width=1, fg_color=C["abu_border"]
-            ).place(relx=0.56, y=10, relheight=0.75)
+            ).place(relx=0.56, y=10, relheight=0.25)
 
         ctk.CTkLabel(info_card, text="IPK TERTINGGI",
-            font=("Segoe UI", 8), text_color=C["teks_sub"]
+            font=("Poppins", 9), text_color=C["teks_sub"]
         ).place(relx=0.59, y=14)
         self._lbl_ipk_max = ctk.CTkLabel(info_card, text="0.00",
-            font=("Segoe UI", 20, "bold"), text_color=C["hijau"])
-        self._lbl_ipk_max.place(relx=0.59, y=34)
+            font=("Poppins", 24, "bold"), text_color=C["hijau"])
+        self._lbl_ipk_max.place(relx=0.59, y=40)
 
         ctk.CTkLabel(info_card, text="IPK TERENDAH",
-            font=("Segoe UI", 8), text_color=C["teks_sub"]
-        ).place(relx=0.59, y=66)
+            font=("Poppins", 9), text_color=C["teks_sub"]
+        ).place(relx=0.59, y=90)
         self._lbl_ipk_min = ctk.CTkLabel(info_card, text="0.00",
-            font=("Segoe UI", 20, "bold"), text_color=C["merah"])
-        self._lbl_ipk_min.place(relx=0.59, y=84)
+            font=("Poppins", 24, "bold"), text_color=C["merah"])
+        self._lbl_ipk_min.place(relx=0.59, y=116)
 
-        dist_card = self._card(row2, height=110)
+        dist_card = self._card(row2, height=280)
         dist_card.grid(row=0, column=1, padx=(6, 0), sticky="nsew")
         dist_card.grid_propagate(False)
 
         ctk.CTkLabel(dist_card, text="DISTRIBUSI PREDIKAT",
-            font=("Segoe UI", 8, "bold"), text_color=C["teks_sub"]
+            font=("Poppins", 8, "bold"), text_color=C["teks_sub"]
         ).place(x=18, y=14)
 
         self._dist_labels = {}
         predikat_specs = [
             ("Cumlaude",        "#7C3AED"),
             ("Sangat Baik",     C["hijau"]),
-            ("Baik",            C["biru"]),
+            ("Baik",            C["oranye"]),
             ("Cukup",           C["kuning"]),
             ("Perlu Perbaikan", C["merah"]),
         ]
         for idx, (nama, warna) in enumerate(predikat_specs):
             ctk.CTkLabel(dist_card, text=nama,
-                font=("Segoe UI", 8), text_color=C["teks_sub"]
+                font=("Poppins", 8), text_color=C["teks_sub"]
             ).place(x=18 + idx * 145, y=36)
             lbl_val = ctk.CTkLabel(dist_card, text="0",
-                font=("Segoe UI", 24, "bold"), text_color=warna)
+                font=("Poppins", 24, "bold"), text_color=warna)
             lbl_val.place(x=18 + idx * 145, y=58)
             self._dist_labels[nama] = lbl_val
-
-        riwayat_card = self._card(self)
-        riwayat_card.pack(fill="both", expand=True, padx=28, pady=(0, 24))
-
-        hdr_row = ctk.CTkFrame(riwayat_card, fg_color="transparent")
-        hdr_row.pack(fill="x", padx=20, pady=(14, 0))
-        ctk.CTkLabel(hdr_row, text="Aktivitas Terbaru",
-            font=F_SUBJUDUL, text_color=C["teks"]).pack(side="left")
-        ctk.CTkLabel(hdr_row, text="10 operasi terakhir",
-            font=F_KECIL, text_color=C["teks_sub"]).pack(side="right")
-
-        col_hdr = ctk.CTkFrame(riwayat_card, fg_color=C["abu_card"], height=28)
-        col_hdr.pack(fill="x", padx=20, pady=(8, 0))
-        col_hdr.pack_propagate(False)
-        for txt, w in [("Waktu", 150), ("Aksi", 80), ("Detail", 0)]:
-            ctk.CTkLabel(col_hdr, text=txt, width=w,
-                font=("Segoe UI", 9, "bold"), text_color=C["teks_sub"],
-                anchor="w").pack(side="left", padx=(10, 0))
-
-        self._riwayat_frame = ctk.CTkScrollableFrame(
-            riwayat_card, fg_color="transparent")
-        self._riwayat_frame.pack(fill="both", expand=True, padx=20, pady=(4, 14))
 
         self.refresh()
 
@@ -723,28 +908,6 @@ class HalamanDashboard(HalamanBase):
         for nama, lbl in self._dist_labels.items():
             lbl.configure(text=str(dist.get(nama, 0)))
 
-        aksi_warna = {
-            "TAMBAH": C["hijau"], "HAPUS": C["merah"],
-            "NILAI":  C["biru"],  "EDIT":  C["kuning"],
-        }
-        for w in self._riwayat_frame.winfo_children():
-            w.destroy()
-        for h in db.get_riwayat()[:10]:
-            row = ctk.CTkFrame(self._riwayat_frame, fg_color="transparent", height=30)
-            row.pack(fill="x", pady=1)
-            row.pack_propagate(False)
-            warna_aksi = aksi_warna.get(h["aksi"], C["teks_sub"])
-            ctk.CTkLabel(row, text=h["waktu"], width=150,
-                font=F_KECIL, text_color=C["teks_sub"], anchor="w"
-            ).pack(side="left", padx=(4, 0))
-            ctk.CTkLabel(row, text=h["aksi"], width=72,
-                font=("Segoe UI", 9, "bold"),
-                text_color=warna_aksi, anchor="w"
-            ).pack(side="left")
-            ctk.CTkLabel(row, text=h["detail"],
-                font=F_KECIL, text_color=C["teks"], anchor="w"
-            ).pack(side="left", padx=(4, 0))
-
 
 # ============================================================
 # HALAMAN DATA MAHASISWA
@@ -775,12 +938,12 @@ class HalamanMahasiswa(HalamanBase):
         )
         search.pack(side="left")
 
-        _btn(toolbar, "+ Tambah", self._form_tambah, width=130).pack(side="right", padx=(6, 0))
-        _btn(toolbar, "Edit Nama", self._form_edit, color=C["kuning"], width=110).pack(side="right", padx=6)
-        _btn(toolbar, "Input Nilai", self._ke_nilai, color=C["hijau"], width=110).pack(side="right", padx=6)
         _btn(toolbar, "Hapus", self._hapus, color=C["merah"], width=90).pack(side="right")
+        _btn(toolbar, "↓ Masukan Nilai", self._ke_nilai, color=C["hijau"], width=130).pack(side="right", padx=6)
+        _btn(toolbar, "✎ Merubah Nama", self._form_edit, color=C["kuning"], width=140).pack(side="right", padx=6)
+        _btn(toolbar, "+ Tambah", self._form_tambah, width=100).pack(side="right", padx=(6, 0))
 
-        tbl_frame = ctk.CTkFrame(self, fg_color=C["putih"],
+        tbl_frame = ctk.CTkFrame(self, fg_color=C["abu_content"],
             corner_radius=12, border_width=1, border_color=C["abu_border"])
         tbl_frame.pack(fill="both", expand=True, padx=28, pady=(0, 24))
 
@@ -808,7 +971,7 @@ class HalamanMahasiswa(HalamanBase):
 
         self._tree.tag_configure("cumlaude",  foreground="#7C3AED")
         self._tree.tag_configure("sangat",    foreground=C["hijau"])
-        self._tree.tag_configure("baik",      foreground=C["biru"])
+        self._tree.tag_configure("baik",      foreground=C["oranye"])
         self._tree.tag_configure("cukup",     foreground=C["kuning"])
         self._tree.tag_configure("perlu",     foreground=C["merah"])
 
@@ -954,19 +1117,19 @@ class HalamanMahasiswa(HalamanBase):
         ctk.CTkLabel(win, text=f"NIM {mhs['nim']}", font=F_KECIL,
             text_color=C["teks_sub"]).pack(padx=24, anchor="w")
 
-        badge = ctk.CTkFrame(win, fg_color=C["biru_muda"], corner_radius=10)
+        badge = ctk.CTkFrame(win, fg_color=C["oranye_muda"], corner_radius=10)
         badge.pack(fill="x", padx=24, pady=14)
         ctk.CTkLabel(badge, text=f"{ipk:.2f}",
-            font=("Segoe UI", 36, "bold"), text_color=C["biru"]).pack(side="left", padx=20, pady=14)
+            font=("Poppins", 36, "bold"), text_color=C["oranye"]).pack(side="left", padx=20, pady=14)
         info = ctk.CTkFrame(badge, fg_color="transparent")
         info.pack(side="left", pady=14)
-        ctk.CTkLabel(info, text=pred, font=("Segoe UI", 13, "bold"),
-            text_color=C["biru"]).pack(anchor="w")
+        ctk.CTkLabel(info, text=pred, font=("Poppins", 13, "bold"),
+            text_color=C["oranye"]).pack(anchor="w")
         ctk.CTkLabel(info, text=f"{db.total_sks(mhs)} SKS  |  Semester terisi: {db.semester_terisi(mhs)}",
             font=F_KECIL, text_color=C["teks_sub"]).pack(anchor="w")
 
         ctk.CTkLabel(win, text="Rincian Semester",
-            font=F_SUBJUDUL, text_color=C["teks"]).pack(padx=24, pady=(4, 6), anchor="w")
+            font=F_SUBJUDUL, text_color="#FFFFFF").pack(padx=24, pady=(4, 6), anchor="w")
 
         scroll = ctk.CTkScrollableFrame(win, fg_color="transparent")
         scroll.pack(fill="both", expand=True, padx=24, pady=(0, 20))
@@ -978,20 +1141,20 @@ class HalamanMahasiswa(HalamanBase):
             smt_hdr = ctk.CTkFrame(scroll, fg_color=C["abu_card"], corner_radius=8)
             smt_hdr.pack(fill="x", pady=(8, 2))
             ctk.CTkLabel(smt_hdr, text=f"Semester {smt_key}",
-                font=("Segoe UI", 11, "bold"), text_color=C["biru"]).pack(side="left", padx=14, pady=8)
+                font=("Poppins", 11, "bold"), text_color=C["oranye"]).pack(side="left", padx=14, pady=8)
             ctk.CTkLabel(smt_hdr, text=f"IPS: {ips:.2f}",
-                font=("Segoe UI", 11, "bold"), text_color=C["hijau"]).pack(side="right", padx=14)
+                font=("Poppins", 11, "bold"), text_color=C["hijau"]).pack(side="right", padx=14)
 
             for mk in data:
-                row = ctk.CTkFrame(scroll, fg_color=C["putih"],
+                row = ctk.CTkFrame(scroll, fg_color=C["abu_content"],
                     border_width=1, border_color=C["abu_border"], corner_radius=6)
                 row.pack(fill="x", pady=1)
                 ctk.CTkLabel(row, text=mk["nama"], font=F_NORMAL,
-                    text_color=C["teks"]).pack(side="left", padx=14, pady=6)
+                    text_color="#FFFFFF").pack(side="left", padx=14, pady=6)
                 ctk.CTkLabel(row, text=f"SKS {mk['sks']}",
                     font=F_KECIL, text_color=C["teks_sub"]).pack(side="right", padx=8)
                 ctk.CTkLabel(row, text=f"{mk['nilai']:.0f}  /  {mk['grade']}",
-                    font=("Segoe UI", 10, "bold"), text_color=C["biru"]).pack(side="right", padx=10)
+                    font=("Poppins", 10, "bold"), text_color=C["oranye"]).pack(side="right", padx=10)
 
 
 # ============================================================
@@ -1009,43 +1172,68 @@ class HalamanNilai(HalamanBase):
         self._build()
 
     def _build(self):
-        top = ctk.CTkFrame(self, fg_color=C["putih"],
+        top = ctk.CTkFrame(self, fg_color=C["abu_content"],
             corner_radius=12, border_width=1, border_color=C["abu_border"])
         top.pack(fill="x", padx=28, pady=16)
 
         row1 = ctk.CTkFrame(top, fg_color="transparent")
         row1.pack(fill="x", padx=20, pady=14)
 
-        ctk.CTkLabel(row1, text="Mahasiswa", font=F_KECIL,
-            text_color=C["teks_sub"]).grid(row=0, column=0, sticky="w")
-        self._search = ctk.CTkEntry(row1, width=260, height=38,
+        # Kolom Kiri: Input Mahasiswa
+        left_col = ctk.CTkFrame(row1, fg_color="transparent")
+        left_col.pack(side="left", fill="both", expand=True)
+
+        ctk.CTkLabel(left_col, text="MAHASISWA", font=F_KECIL,
+            text_color=C["oranye"]).grid(row=0, column=0, sticky="w")
+        self._search = ctk.CTkEntry(left_col, width=260, height=38,
             placeholder_text="Ketik NIM atau nama...", font=F_NORMAL, corner_radius=8)
         self._search.grid(row=1, column=0, padx=(0, 16))
         self._search.bind("<KeyRelease>", self._update_dropdown)
 
         self._dd_var  = tk.StringVar()
         self._dd_data = {}
-        self._combo   = ttk.Combobox(row1, textvariable=self._dd_var,
-            state="readonly", width=30, font=("Segoe UI", 10))
+        self._combo   = ttk.Combobox(left_col, textvariable=self._dd_var,
+            state="readonly", width=30, font=("Poppins", 10))
         self._combo.grid(row=1, column=1, padx=(0, 16))
         self._combo.bind("<<ComboboxSelected>>", self._pilih_mahasiswa)
 
-        ctk.CTkLabel(row1, text="Semester", font=F_KECIL,
+        ctk.CTkLabel(left_col, text="Semester", font=F_KECIL,
             text_color=C["teks_sub"]).grid(row=0, column=2, sticky="w")
         self._smt_var = tk.StringVar(value="1")
-        smt_cb = ttk.Combobox(row1, textvariable=self._smt_var,
+        smt_cb = ttk.Combobox(left_col, textvariable=self._smt_var,
             values=["1", "2", "3", "4", "5", "6"],
-            state="readonly", width=8, font=("Segoe UI", 10))
+            state="readonly", width=8, font=("Poppins", 10))
         smt_cb.grid(row=1, column=2)
         smt_cb.bind("<<ComboboxSelected>>", self._load_form)
 
-        row1.columnconfigure((0, 1, 2), pad=8)
+        left_col.columnconfigure((0, 1, 2), pad=8)
+
+        # Kolom Kanan: Beri Pesan
+        right_col = ctk.CTkFrame(row1, fg_color="transparent")
+        right_col.pack(side="right", fill="x")
+
+        ctk.CTkLabel(right_col, text="BERI PESAN", font=F_KECIL,
+            text_color=C["oranye"]).pack(anchor="w")
+        
+        msg_frame = ctk.CTkFrame(right_col, fg_color=C["broken_white"],
+            corner_radius=8, border_width=1, border_color=C["abu_border"])
+        msg_frame.pack(fill="x", pady=(4, 0))
+        
+        self._msg_entry = ctk.CTkEntry(msg_frame, width=250, height=34,
+            placeholder_text="Tulis pesan untuk mahasiswa...", 
+            font=F_NORMAL, corner_radius=6)
+        self._msg_entry.pack(side="left", padx=8, pady=6)
+        
+        btn_kirim = ctk.CTkButton(msg_frame, text="Kirim", width=80, height=34,
+            font=F_NORMAL, corner_radius=6, fg_color=C["oranye"],
+            hover_color=C["oranye_gelap"], command=self._kirim_pesan)
+        btn_kirim.pack(side="left", padx=(0, 8), pady=6)
 
         self._lbl_info = ctk.CTkLabel(top, text="",
             font=F_KECIL, text_color=C["teks_sub"])
         self._lbl_info.pack(anchor="w", padx=20, pady=(0, 10))
 
-        self._form_card = ctk.CTkFrame(self, fg_color=C["putih"],
+        self._form_card = ctk.CTkFrame(self, fg_color=C["abu_content"],
             corner_radius=12, border_width=1, border_color=C["abu_border"])
         self._form_card.pack(fill="both", expand=True, padx=28, pady=(0, 24))
 
@@ -1100,7 +1288,7 @@ class HalamanNilai(HalamanBase):
         header = ctk.CTkFrame(self._form_card, fg_color="transparent")
         header.pack(fill="x", padx=20, pady=(14, 8))
         ctk.CTkLabel(header, text=f"Nilai Semester {smt}",
-            font=F_SUBJUDUL, text_color=C["teks"]).pack(side="left")
+            font=F_SUBJUDUL, text_color="#FFFFFF").pack(side="left")
 
         semua    = db.get_semua()
         mhs      = next((m for m in semua if m["nim"] == self._nim_aktif), None)
@@ -1115,7 +1303,7 @@ class HalamanNilai(HalamanBase):
 
             ctk.CTkLabel(row,
                 text=f"{nama_mk}",
-                font=F_NORMAL, text_color=C["teks"], anchor="w", width=320
+                font=F_NORMAL, text_color="#FFFFFF", anchor="w", width=320
             ).pack(side="left", padx=14, pady=10)
 
             ctk.CTkLabel(row, text=f"{sks} SKS",
@@ -1131,7 +1319,7 @@ class HalamanNilai(HalamanBase):
                 e.insert(0, str(int(existing[i]["nilai"])))
 
             grade_lbl = ctk.CTkLabel(row, text="", width=36,
-                font=("Segoe UI", 10, "bold"), text_color=C["biru"])
+                font=("Poppins", 10, "bold"), text_color=C["oranye"])
             grade_lbl.pack(side="right")
 
             def update_grade(event, el=e, gl=grade_lbl):
@@ -1139,7 +1327,7 @@ class HalamanNilai(HalamanBase):
                     g, _ = db.nilai_ke_grade(float(el.get()))
                     colors = {
                         "A": C["hijau"], "A-": C["hijau"],
-                        "B+": "#16A34A", "B": C["biru"], "B-": C["biru"],
+                        "B+": "#16A34A", "B": C["oranye"], "B-": C["oranye"],
                         "C+": C["kuning"], "C": C["kuning"],
                         "D": C["merah"], "E": C["merah"],
                     }
@@ -1175,6 +1363,17 @@ class HalamanNilai(HalamanBase):
             self._on_selesai()
         except ValueError as err:
             messagebox.showerror("Gagal", str(err))
+
+    def _kirim_pesan(self):
+        pesan = self._msg_entry.get().strip()
+        if not self._nim_aktif:
+            messagebox.showwarning("Perhatian", "Pilih mahasiswa terlebih dahulu.")
+            return
+        if not pesan:
+            messagebox.showwarning("Perhatian", "Tulis pesan terlebih dahulu.")
+            return
+        messagebox.showinfo("Berhasil", f"Pesan dikirim ke mahasiswa {self._nim_aktif}:\n\n{pesan}")
+        self._msg_entry.delete(0, "end")
 
     def set_nim(self, nim: str):
         semua = db.get_semua()
@@ -1223,7 +1422,7 @@ class HalamanStatistik(HalamanBase):
         smt_opts = ["Semua", "1", "2", "3", "4", "5", "6"]
         smt_cb = ttk.Combobox(bar, textvariable=self._filter_smt,
                               values=smt_opts, state="readonly", width=10,
-                              font=("Segoe UI", 10))
+                              font=("Poppins", 10))
         smt_cb.pack(side="left")
         smt_cb.bind("<<ComboboxSelected>>", lambda *_: self.refresh())
         _btn(bar, "Refresh", self.refresh, width=100).pack(side="right")
@@ -1241,7 +1440,7 @@ class HalamanStatistik(HalamanBase):
         card_ipk = self._card(row1)
         card_ipk.grid(row=0, column=0, padx=(0, 8), sticky="nsew")
         ctk.CTkLabel(card_ipk, text="Distribusi Rentang IPK",
-                     font=F_SUBJUDUL, text_color=C["teks"]).pack(padx=16, pady=(14, 6), anchor="w")
+                     font=F_SUBJUDUL, text_color="#FFFFFF").pack(padx=16, pady=(14, 6), anchor="w")
         self._canvas_ipk = tk.Canvas(card_ipk, height=220,
                                      bg=C["putih"], highlightthickness=0)
         self._canvas_ipk.pack(fill="x", padx=16, pady=(0, 14))
@@ -1249,7 +1448,7 @@ class HalamanStatistik(HalamanBase):
         card_pred = self._card(row1)
         card_pred.grid(row=0, column=1, padx=(8, 0), sticky="nsew")
         ctk.CTkLabel(card_pred, text="Sebaran Predikat",
-                     font=F_SUBJUDUL, text_color=C["teks"]).pack(padx=16, pady=(14, 6), anchor="w")
+                     font=F_SUBJUDUL, text_color="#FFFFFF").pack(padx=16, pady=(14, 6), anchor="w")
         self._canvas_pred = tk.Canvas(card_pred, height=220,
                                       bg=C["putih"], highlightthickness=0)
         self._canvas_pred.pack(fill="x", padx=16, pady=(0, 14))
@@ -1258,7 +1457,7 @@ class HalamanStatistik(HalamanBase):
         card_ips = self._card(scroll)
         card_ips.pack(fill="x", pady=(0, 12))
         ctk.CTkLabel(card_ips, text="Rata-rata IPS per Semester",
-                     font=F_SUBJUDUL, text_color=C["teks"]).pack(padx=16, pady=(14, 6), anchor="w")
+                     font=F_SUBJUDUL, text_color="#FFFFFF").pack(padx=16, pady=(14, 6), anchor="w")
         self._canvas_ips = tk.Canvas(card_ips, height=200,
                                      bg=C["putih"], highlightthickness=0)
         self._canvas_ips.pack(fill="x", padx=16, pady=(0, 14))
@@ -1267,7 +1466,7 @@ class HalamanStatistik(HalamanBase):
         card_grade = self._card(scroll)
         card_grade.pack(fill="x", pady=(0, 12))
         ctk.CTkLabel(card_grade, text="Distribusi Grade (Semua Mata Kuliah)",
-                     font=F_SUBJUDUL, text_color=C["teks"]).pack(padx=16, pady=(14, 6), anchor="w")
+                     font=F_SUBJUDUL, text_color="#FFFFFF").pack(padx=16, pady=(14, 6), anchor="w")
         self._canvas_grade = tk.Canvas(card_grade, height=200,
                                        bg=C["putih"], highlightthickness=0)
         self._canvas_grade.pack(fill="x", padx=16, pady=(0, 14))
@@ -1276,7 +1475,7 @@ class HalamanStatistik(HalamanBase):
         card_sum = self._card(scroll)
         card_sum.pack(fill="x", pady=(0, 12))
         ctk.CTkLabel(card_sum, text="Ringkasan Statistik",
-                     font=F_SUBJUDUL, text_color=C["teks"]).pack(padx=16, pady=(14, 6), anchor="w")
+                     font=F_SUBJUDUL, text_color="#FFFFFF").pack(padx=16, pady=(14, 6), anchor="w")
         self._sum_frame = ctk.CTkFrame(card_sum, fg_color="transparent")
         self._sum_frame.pack(fill="x", padx=16, pady=(0, 14))
 
@@ -1362,14 +1561,14 @@ class HalamanStatistik(HalamanBase):
         # --- 1. Bar chart distribusi IPK ---
         colors_ipk = [
             C["merah"], C["kuning"], "#F59E0B",
-            C["biru"], C["hijau"], "#059669"
+            C["oranye"], C["hijau"], "#059669"
         ]
         Chart.bar(self._canvas_ipk, data["rentang"],
                   colors=colors_ipk, title="Jumlah mahasiswa per rentang IPK")
 
         # --- 2. Pie chart predikat ---
         pred_data = [(k, v) for k, v in data["pred_dist"].items() if v > 0]
-        pred_colors = [C["ungu"], C["hijau"], C["biru"], C["kuning"], C["merah"]]
+        pred_colors = [C["ungu"], C["hijau"], C["oranye"], C["kuning"], C["merah"]]
         Chart.pie(self._canvas_pred, pred_data,
                   colors=pred_colors, title="Sebaran predikat mahasiswa")
 
@@ -1379,7 +1578,7 @@ class HalamanStatistik(HalamanBase):
         smt_labels = [f"Smt {s}" for s in smts]
         if len(ips_vals) >= 2:
             Chart.line(self._canvas_ips,
-                       datasets=[("Rata-rata IPS", C["biru"], ips_vals)],
+                       datasets=[("Rata-rata IPS", C["oranye"], ips_vals)],
                        labels=smt_labels,
                        title="Tren rata-rata IPS per semester")
         else:
@@ -1410,8 +1609,8 @@ class HalamanStatistik(HalamanBase):
 
         ipk_list = data["ipk_list"]
         stats = [
-            ("Mahasiswa dengan nilai",    str(len(ipk_list)),                    C["biru"]),
-            ("Rata-rata IPK",             f"{sum(ipk_list)/len(ipk_list):.2f}" if ipk_list else "0.00", C["biru"]),
+            ("Mahasiswa dengan nilai",    str(len(ipk_list)),                    C["oranye"]),
+            ("Rata-rata IPK",             f"{sum(ipk_list)/len(ipk_list):.2f}" if ipk_list else "0.00", C["oranye"]),
             ("IPK tertinggi",             f"{max(ipk_list):.2f}" if ipk_list else "0.00", C["hijau"]),
             ("IPK terendah",              f"{min(ipk_list):.2f}" if ipk_list else "0.00", C["merah"]),
             ("Total mahasiswa terdaftar", str(data["total"]),                    C["teks"]),
@@ -1422,10 +1621,10 @@ class HalamanStatistik(HalamanBase):
             box = ctk.CTkFrame(self._sum_frame, fg_color=C["abu_card"],
                                corner_radius=10)
             box.grid(row=0, column=col, padx=6, sticky="nsew")
-            ctk.CTkLabel(box, text=label, font=("Segoe UI", 8),
+            ctk.CTkLabel(box, text=label, font=("Poppins", 8),
                          text_color=C["teks_sub"]).pack(padx=12, pady=(10, 2), anchor="w")
             ctk.CTkLabel(box, text=val,
-                         font=("Segoe UI", 20, "bold"),
+                         font=("Poppins", 20, "bold"),
                          text_color=color).pack(padx=12, pady=(0, 10), anchor="w")
 
 
@@ -1446,7 +1645,7 @@ class HalamanRiwayat(HalamanBase):
         toolbar.pack(fill="x", padx=28, pady=12)
         _btn(toolbar, "Refresh", self.refresh, width=100).pack(side="right")
 
-        card = ctk.CTkFrame(self, fg_color=C["putih"],
+        card = ctk.CTkFrame(self, fg_color=C["abu_content"],
             corner_radius=12, border_width=1, border_color=C["abu_border"])
         card.pack(fill="both", expand=True, padx=28, pady=(0, 24))
 
@@ -1462,7 +1661,7 @@ class HalamanRiwayat(HalamanBase):
 
         self._tree.tag_configure("TAMBAH", foreground=C["hijau"])
         self._tree.tag_configure("HAPUS",  foreground=C["merah"])
-        self._tree.tag_configure("NILAI",  foreground=C["biru"])
+        self._tree.tag_configure("NILAI",  foreground=C["oranye"])
         self._tree.tag_configure("EDIT",   foreground=C["kuning"])
 
         vsb = ttk.Scrollbar(card, orient="vertical", command=self._tree.yview)
@@ -1488,55 +1687,81 @@ class HalamanRiwayat(HalamanBase):
 class HalamanLogin(ctk.CTkFrame):
 
     def __init__(self, parent, on_login):
-        super().__init__(parent, corner_radius=0, fg_color=C["abu_bg"])
+        super().__init__(parent, corner_radius=0, fg_color=C["broken_white"])
         self._on_login = on_login
         self._build()
 
     def _build(self):
-        kiri = ctk.CTkFrame(self, fg_color=C["biru_gelap"], corner_radius=0)
-        kiri.place(relx=0, rely=0, relwidth=0.45, relheight=1)
+        # Header oranye di atas
+        header = ctk.CTkFrame(self, fg_color=C["oranye"], corner_radius=0, height=90)
+        header.pack(fill="x", side="top")
+        header.pack_propagate(False)
+        
+        ctk.CTkLabel(header, text="EXEL INDONESIAN ENGINEERING",
+            font=("Poppins", 36, "bold"), text_color="#FFFFFF"
+        ).place(relx=0.5, rely=0.45, anchor="center")
+        
+        ctk.CTkLabel(header, text="UNIVERSITAS PENDIDIKAN EXEL",
+            font=("Poppins", 14), text_color="#FFFFFF"
+        ).place(relx=0.5, rely=0.75, anchor="center")
 
-        ctk.CTkLabel(kiri, text="ARION",
-            font=("Segoe UI", 42, "bold"), text_color="#FFFFFF"
-        ).place(relx=0.5, rely=0.38, anchor="center")
+        # Area login di tengah (vertikal layout)
+        konten = ctk.CTkFrame(self, fg_color=C["broken_white"], corner_radius=0)
+        konten.pack(fill="both", expand=True, side="top")
 
-        ctk.CTkLabel(kiri,
-            text="Automation Robotics Information Online Network\nPendidikan Teknik Otomasi Industri dan Robotika",
-            font=("Segoe UI", 13), text_color="#93C5FD",
-            justify="center"
-        ).place(relx=0.5, rely=0.52, anchor="center")
+        # Card utama dinaikkan sedikit (rely 0.45)
+        card = ctk.CTkFrame(konten, fg_color=C["abu_content"], corner_radius=16, 
+                           border_width=1, border_color=C["abu_border"],
+                           width=420, height=580)
+        card.place(relx=0.5, rely=0.45, anchor="center")
 
-        kanan = ctk.CTkFrame(self, fg_color=C["putih"], corner_radius=0)
-        kanan.place(relx=0.45, rely=0, relwidth=0.55, relheight=1)
+        # Logo/Title di dalam card
+        ctk.CTkLabel(card, text="Selamat Datang",
+            font=("Poppins", 20, "bold"), text_color=C["oranye"]
+        ).pack(pady=(30, 8))
+        
+        ctk.CTkLabel(card, text="Masuk ke Sistem Informasi Akademik",
+            font=("Poppins", 11), text_color=C["teks_sub"]
+        ).pack(pady=(0, 20))
 
-        card = ctk.CTkFrame(kanan, fg_color="transparent", width=360)
-        card.place(relx=0.5, rely=0.5, anchor="center")
+        ctk.CTkLabel(card, text="Username", font=("Poppins", 11, "bold"),
+            text_color="#FFFFFF").pack(anchor="w", padx=40)
+        self._e_user = _entry(card, placeholder="Masukkan username", width=340)
+        self._e_user.pack(pady=(8, 16), padx=40)
 
-        ctk.CTkLabel(card, text="Masuk ke Sistem",
-            font=("Segoe UI", 24, "bold"), text_color=C["teks"]
-        ).pack(anchor="w", pady=(0, 4))
-        ctk.CTkLabel(card, text="Gunakan akun admin untuk melanjutkan.",
-            font=F_KECIL, text_color=C["teks_sub"]
-        ).pack(anchor="w", pady=(0, 28))
-
-        ctk.CTkLabel(card, text="Username", font=F_KECIL,
-            text_color=C["teks_sub"]).pack(anchor="w")
-        self._e_user = _entry(card, placeholder="Username", width=360)
-        self._e_user.pack(pady=(4, 12))
-
-        ctk.CTkLabel(card, text="Password", font=F_KECIL,
-            text_color=C["teks_sub"]).pack(anchor="w")
-        self._e_pass = _entry(card, placeholder="Password", show="*", width=360)
-        self._e_pass.pack(pady=(4, 24))
+        ctk.CTkLabel(card, text="Password", font=("Poppins", 11, "bold"),
+            text_color="#FFFFFF").pack(anchor="w", padx=40)
+        self._e_pass = _entry(card, placeholder="Masukkan password", show="*", width=340)
+        self._e_pass.pack(pady=(8, 24), padx=40)
 
         _bind_enter_chain([self._e_user, self._e_pass])
         self._e_pass.bind("<Return>", lambda e: self._login())
 
-        _btn(card, "Masuk", self._login, width=360, height=44).pack()
+        _btn(card, "MASUK", self._login, color=C["oranye"], width=340, height=48).pack(padx=40)
 
         self._lbl_err = ctk.CTkLabel(card, text="",
-            font=F_KECIL, text_color=C["merah"])
-        self._lbl_err.pack(pady=(10, 0))
+            font=("Poppins", 10), text_color=C["merah"])
+        self._lbl_err.pack(pady=(10, 20))
+
+        # Kotak informasi SSO UPI di bawah form login
+        sso_box = ctk.CTkFrame(card, fg_color=C["broken_white"], corner_radius=12,
+                              border_width=1, border_color=C["oranye"])
+        sso_box.pack(fill="x", padx=20, pady=(0, 20))
+        
+        # Header kecil di pojok kiri atas kotak SSO
+        header_sso = ctk.CTkLabel(sso_box, text="Selamat datang di Single Sign On (SSO) UPI",
+            font=("Poppins", 11, "bold"), text_color=C["oranye"],
+            anchor="w")
+        header_sso.pack(fill="x", padx=15, pady=(15, 5))
+        
+        # Isi pesan SSO
+        isi_sso = """Seiring dengan sistem manajemen terintegrasi, SSO UPI merupakan salah satu gerbang integrasi berbagai aplikasi yang diberdayakan untuk civitas UPI.
+
+Semoga SSO UPI ini dapat mempermudah civitas dalam memberdayakan dan menganalisis hasil aplikasi yang ada, serta untuk terus menyempurnakan dari berbagai aspek. Masukan bapak/ibu dapat disampaikan melalui layanan-tik[at]upi.edu."""
+        
+        ctk.CTkLabel(sso_box, text=isi_sso,
+            font=("Poppins", 9), text_color=C["teks_sub"],
+            justify="left", wraplength=360).pack(padx=15, pady=(0, 15), anchor="w")
 
         self._e_user.focus_set()
 
@@ -1574,12 +1799,15 @@ class App(ctk.CTk):
         self._sidebar.aktifkan("dashboard")
 
     def _bangun_shell(self):
-        self._sidebar = Sidebar(self, self._navigasi)
-        self._sidebar.pack(side="left", fill="y")
-
+        # Area konten utama di kiri
         self._area = ctk.CTkFrame(self, corner_radius=0, fg_color=C["abu_bg"])
         self._area.pack(side="left", fill="both", expand=True)
 
+        # Sidebar navigasi di kanan
+        self._sidebar = Sidebar(self, self._navigasi)
+        self._sidebar.pack(side="right", fill="y")
+
+        self._beranda  = HalamanBeranda(self._area)  # Halaman Beranda dengan konten
         self._dash      = HalamanDashboard(self._area)
         self._mhs       = HalamanMahasiswa(self._area, on_nilai=self._buka_nilai)
         self._nilai     = HalamanNilai(self._area, on_selesai=self._selesai_nilai)
@@ -1595,6 +1823,7 @@ class App(ctk.CTk):
             return
 
         mapping = {
+            "beranda":     self._beranda,
             "dashboard":  self._dash,
             "mahasiswa":  self._mhs,
             "nilai":      self._nilai,
