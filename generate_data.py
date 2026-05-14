@@ -7,8 +7,18 @@ FILE = "database.json"
 
 NAMA = [
     "Andi", "Budi", "Citra", "Dewi", "Eka",
-    "Fajar", "Gita", "Hadi", "Intan", "Joko"
+    "Fajar", "Gita", "Hadi", "Intan", "Joko",
+    "Kartika", "Lestari", "Muhammad", "Nadia", "Opik",
+    "Putri", "Qori", "Rudi", "Siti", "Tono",
+    "Umar", "Vina", "Wawan", "Xena", "Yusuf",
+    "Zahra", "Ahmad", "Bayu", "Caca", "Dimas",
+    "Erna", "Farhan", "Gusti", "Hana", "Indra",
+    "Jamil", "Kiki", "Lina", "Mamat", "Nina",
+    "Oki", "Pipit", "Rina", "Syahrul", "Tari",
+    "Usman", "Vivi", "Windi", "Yanti", "Zainal"
 ]
+
+JUMLAH_MAHASISWA = 1000
 
 KURIKULUM = {
     1: [
@@ -34,8 +44,9 @@ def generate():
         "riwayat": []
     }
 
-    for i, nama in enumerate(NAMA, start=1):
-        nim = f"20240{i:03}"
+    for i in range(1, JUMLAH_MAHASISWA + 1):
+        nama = NAMA[(i - 1) % len(NAMA)]
+        nim = f"2024{i:05}"
 
         mhs = {
             "nim": nim,
@@ -61,7 +72,7 @@ def generate():
     with open(FILE, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2, ensure_ascii=False)
 
-    print("✅ Data mahasiswa + nilai berhasil dibuat!")
+    print(f"✅ {JUMLAH_MAHASISWA} data mahasiswa + nilai berhasil dibuat!")
 
 if __name__ == "__main__":
     generate()
