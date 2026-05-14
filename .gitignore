@@ -1,0 +1,32 @@
+```gitignore
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+venv/
+.venv/
+.env
+.env.local
+.env.*
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Database
+database.json
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.swp
+*~
+
+# OS generated files
+.DS_Store
+Thumbs.db
+```
