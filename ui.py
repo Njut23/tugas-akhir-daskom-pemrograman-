@@ -504,7 +504,13 @@ class Sidebar(ctk.CTkFrame):
         # MENU
         # ====================================================
 
-        self._section("")
+        self._section("MENU")
+
+        self._menu_button(
+            "Beranda",
+            "beranda",
+            "🏠"
+        )
 
         self._menu_button(
             "Dashboard",
@@ -538,6 +544,12 @@ class Sidebar(ctk.CTkFrame):
             "Riwayat Akademik",
             "riwayat",
             "🕘"
+        )
+
+        self._menu_button(
+            "Kalender Akademik",
+            "jadwal_akademik",
+            "📅"
         )
 
         self._section("SISTEM")
@@ -645,6 +657,124 @@ class HalamanBase(ctk.CTkFrame):
             **kw
         )
 
+
+
+# ============================================================
+# HALAMAN BERANDA
+# ============================================================
+
+class HalamanBeranda(HalamanBase):
+
+    def __init__(self, parent):
+        super().__init__(parent)
+        self._build()
+
+    def _build(self):
+        # Header
+        hdr = ctk.CTkFrame(self, fg_color="transparent", corner_radius=0, height=70)
+        hdr.pack(fill="x", padx=0, pady=0)
+        hdr.pack_propagate(False)
+        inner = ctk.CTkFrame(hdr, fg_color="transparent")
+        inner.pack(side="left", padx=28, pady=12)
+        ctk.CTkLabel(inner, text="🏠", font=("Segoe UI Emoji", 20)).pack(side="left", padx=(0, 8))
+        ctk.CTkLabel(inner, text="Beranda", font=F_JUDUL, text_color=C["teks"]).pack(side="left", anchor="w")
+        ctk.CTkFrame(self, height=1, fg_color=C["abu_border"]).pack(fill="x")
+
+        # Scroll area
+        scroll = ctk.CTkScrollableFrame(self, fg_color="transparent", corner_radius=0)
+        scroll.pack(fill="both", expand=True, padx=24, pady=16)
+
+        # Banner Pengumuman
+        banner = ctk.CTkFrame(scroll, fg_color=C["oranye"], corner_radius=16)
+        banner.pack(fill="x", pady=(0, 20))
+
+        banner_inner = ctk.CTkFrame(banner, fg_color="transparent")
+        banner_inner.pack(fill="x", padx=28, pady=20)
+
+        ikon_wrap = ctk.CTkFrame(
+            banner_inner, fg_color="#FFFFFF",
+            width=72, height=72, corner_radius=36
+        )
+        ikon_wrap.pack(side="left", padx=(0, 20))
+        ikon_wrap.pack_propagate(False)
+        ctk.CTkLabel(
+            ikon_wrap, text="📢",
+            font=("Segoe UI Emoji", 28)
+        ).place(relx=0.5, rely=0.5, anchor="center")
+
+        teks_wrap = ctk.CTkFrame(banner_inner, fg_color="transparent")
+        teks_wrap.pack(side="left", fill="both", expand=True)
+
+        ctk.CTkLabel(
+            teks_wrap, text="Pengumuman",
+            font=("Segoe UI", 18, "bold"),
+            text_color="#FFFFFF", anchor="w"
+        ).pack(anchor="w", pady=(0, 8))
+
+        pengumuman = [
+            "Bagi Anda yang akan mengikuti Kuliah Semester Antara / Semester Padat, silakan pilih mata kuliah pada tautan: Semester Padat",
+            "Pembayaran melalui virtual account mulai tanggal 1 Juni 2026 sampai 15 Juni 2026.",
+            "Setelah melakukan proses pembayaran, Anda dapat mengisi IRS dan melaksanakan perwalian daring pada tanggal 18 Juni 2026 sampai 21 Juni 2026.",
+        ]
+        for p in pengumuman:
+            baris = ctk.CTkFrame(teks_wrap, fg_color="transparent")
+            baris.pack(anchor="w", pady=2, fill="x")
+            ctk.CTkLabel(
+                baris, text="✅", font=("Segoe UI Emoji", 12),
+                text_color="#FFFFFF"
+            ).pack(side="left", padx=(0, 6))
+            ctk.CTkLabel(
+                baris, text=p,
+                font=("Segoe UI", 11),
+                text_color="#FFFFFF", anchor="w", justify="left", wraplength=650
+            ).pack(side="left", anchor="w")
+
+        # Info Cards
+        info_items = [
+            ("👤", "Manajemen DIM", "Fitur-fitur manajemen Data Induk Mahasiswa (DIM), pengajuan IRS dan PRS, informasi Kalender Akademik, dan Jadwal Kuliah."),
+            ("🌐", "Akses Di Mana Saja", "Sistem ini menggunakan Single Sign On UPI sebagai fitur otentifikasi, dan dikembangkan dengan infrastruktur internet sehingga dapat diakses di mana saja."),
+            ("🗄️", "Data Terintegrasi", "Data yang dimunculkan merupakan replikasi dari data pada SIAK Utama UPI. Jika terdapat perbedaan, SIAK Utama menjadi rujukan yang dianggap benar."),
+        ]
+
+        for ikon, judul, deskripsi in info_items:
+            card = ctk.CTkFrame(
+                scroll,
+                fg_color=C["putih"],
+                corner_radius=14,
+                border_width=1,
+                border_color=C["abu_border"]
+            )
+            card.pack(fill="x", pady=8)
+
+            ikon_card = ctk.CTkFrame(
+                card, fg_color=C["oranye_muda"],
+                width=54, height=54, corner_radius=12
+            )
+            ikon_card.pack(side="left", padx=20, pady=16)
+            ikon_card.pack_propagate(False)
+            ctk.CTkLabel(
+                ikon_card, text=ikon,
+                font=("Segoe UI Emoji", 22)
+            ).place(relx=0.5, rely=0.5, anchor="center")
+
+            teks_card = ctk.CTkFrame(card, fg_color="transparent")
+            teks_card.pack(side="left", fill="both", expand=True, pady=16, padx=(0, 20))
+
+            ctk.CTkLabel(
+                teks_card, text=judul,
+                font=("Segoe UI", 13, "bold"),
+                text_color=C["teks"], anchor="w"
+            ).pack(anchor="w")
+
+            ctk.CTkLabel(
+                teks_card, text=deskripsi,
+                font=("Segoe UI", 11),
+                text_color=C["teks_sub"], anchor="w",
+                justify="left", wraplength=700
+            ).pack(anchor="w", pady=(4, 0))
+
+    def refresh(self):
+        pass
 
 # ============================================================
 # HALAMAN DASHBOARD
@@ -1412,18 +1542,26 @@ class HalamanNilai(HalamanBase):
         # ── Top header bar ────────────────────────────────────
         self._build_topbar()
 
+        # ── Scrollable container untuk selector + form ────────
+        self._scroll_container = ctk.CTkScrollableFrame(
+            self,
+            fg_color="transparent",
+            corner_radius=0
+        )
+        self._scroll_container.pack(fill="both", expand=True, padx=0, pady=(0, 16))
+
         # ── Selector card ─────────────────────────────────────
         self._build_selector()
 
         # ── Form card (tabel nilai) ───────────────────────────
         self._form_outer = ctk.CTkFrame(
-            self,
+            self._scroll_container,
             fg_color=C["putih"],
             corner_radius=14,
             border_width=1,
             border_color="#E8E8E8"
         )
-        self._form_outer.pack(fill="both", expand=True, padx=24, pady=(0, 16))
+        self._form_outer.pack(fill="both", expand=True, padx=24, pady=(0, 0))
 
         self._tampil_placeholder()
         self._update_dropdown()
@@ -1468,7 +1606,7 @@ class HalamanNilai(HalamanBase):
 
     def _build_selector(self):
         card = ctk.CTkFrame(
-            self,
+            self._scroll_container,
             fg_color=C["putih"],
             corner_radius=14,
             border_width=1,
@@ -1812,9 +1950,9 @@ class HalamanNilai(HalamanBase):
         ctk.CTkButton(
             right, text="✕  Batal", width=110, height=40,
             corner_radius=10,
-            fg_color=C["putih"], hover_color="#F5F5F5",
-            text_color=C["teks_sub"], font=("Segoe UI", 11),
-            border_width=1, border_color="#E0E0E0",
+            fg_color="#FEE2E2", hover_color="#FECACA",
+            text_color="#DC2626", font=("Segoe UI", 11, "bold"),
+            border_width=0,
             command=self._tampil_placeholder
         ).pack(side="left", padx=(0, 10))
 
@@ -1906,135 +2044,183 @@ class HalamanNilai(HalamanBase):
 
 class HalamanStatistik(HalamanBase):
     """
-    Dashboard statistik penuh dengan 4 grafik:
-    1. Distribusi IPK (bar horizontal — rentang 0-4)
-    2. Distribusi Predikat (pie chart)
-    3. Rata-rata IPS per Semester (line chart)
-    4. Distribusi Grade per Semester (column chart)
+    Dashboard statistik — layout mirip screenshot:
+    Row 1 : Bar IPK (kiri lebar) + Pie Predikat (kanan, dengan footer stat)
+    Row 2 : Line IPS per Semester (full width)
+    Row 3 : Column Grade (kiri lebar) + Ringkasan Statistik (kanan)
+    Toolbar filter semester + tombol Refresh ada di header bar.
     """
 
     def __init__(self, parent):
         super().__init__(parent)
-        self._header("Statistik Kelas", "Visualisasi data akademik seluruh mahasiswa")
         self._build()
 
+    # ------------------------------------------------------------------
+    # BUILD
+    # ------------------------------------------------------------------
     def _build(self):
-        # Toolbar refresh
-        bar = ctk.CTkFrame(self, fg_color="transparent")
-        bar.pack(fill="x", padx=28, pady=(12, 4))
-        self._filter_smt = tk.StringVar(value="Semua")
-        ctk.CTkLabel(bar, text="Filter Semester:", font=F_KECIL,
-                     text_color=C["teks_sub"]).pack(side="left", padx=(0, 8))
-        smt_opts = ["Semua", "1", "2", "3", "4", "5", "6"]
-        smt_cb = ttk.Combobox(bar, textvariable=self._filter_smt,
-                              values=smt_opts, state="readonly", width=10,
-                              font=("Segoe UI", 10))
-        smt_cb.pack(side="left")
+        # ── Header bar (judul + filter + refresh) ──────────────────────
+        topbar = ctk.CTkFrame(self, fg_color=C["putih"], corner_radius=0, height=64)
+        topbar.pack(fill="x")
+        topbar.pack_propagate(False)
+        ctk.CTkFrame(self, height=1, fg_color=C["abu_border"]).pack(fill="x")
+
+        # Judul kiri
+        titl = ctk.CTkFrame(topbar, fg_color="transparent")
+        titl.pack(side="left", padx=24, pady=10)
+        ctk.CTkLabel(titl, text="Statistik Kelas",
+                     font=("Segoe UI", 18, "bold"),
+                     text_color=C["teks"]).pack(anchor="w")
+        ctk.CTkLabel(titl, text="Visualisasi data akademik seluruh mahasiswa",
+                     font=F_KECIL, text_color=C["teks_sub"]).pack(anchor="w")
+
+        # Filter + refresh kanan
+        ctrl = ctk.CTkFrame(topbar, fg_color="transparent")
+        ctrl.pack(side="right", padx=24)
+        ctk.CTkLabel(ctrl, text="Filter Semester:",
+                     font=F_KECIL, text_color=C["teks_sub"]).pack(side="left", padx=(0, 6))
+        self._filter_smt = tk.StringVar(value="Semua Semester")
+        smt_opts = ["Semua Semester", "1", "2", "3", "4", "5", "6"]
+        smt_cb = ttk.Combobox(ctrl, textvariable=self._filter_smt,
+                               values=smt_opts, state="readonly", width=14,
+                               font=("Segoe UI", 10))
+        smt_cb.pack(side="left", padx=(0, 10))
         smt_cb.bind("<<ComboboxSelected>>", lambda *_: self.refresh())
-        _btn(bar, "Refresh", self.refresh, width=100).pack(side="right")
 
-        # Scrollable area untuk semua grafik
-        scroll = ctk.CTkScrollableFrame(self, fg_color="transparent")
-        scroll.pack(fill="both", expand=True, padx=28, pady=(0, 20))
+        # Tombol Refresh oranye
+        ctk.CTkButton(
+            ctrl, text="↻  Refresh", command=self.refresh,
+            width=110, height=36,
+            font=("Segoe UI", 11, "bold"),
+            fg_color=C["oranye"], hover_color=C["oranye_gelap"],
+            corner_radius=8,
+        ).pack(side="left")
 
-        # Row 1: distribusi IPK (bar) + predikat (pie)
+        # ── Scrollable content ──────────────────────────────────────────
+        scroll = ctk.CTkScrollableFrame(self, fg_color=C["abu_bg"])
+        scroll.pack(fill="both", expand=True)
+
+        pad = {"padx": 20, "pady": (0, 14)}
+
+        # ── ROW 1: Bar IPK (weight 3) + Pie Predikat (weight 2) ────────
         row1 = ctk.CTkFrame(scroll, fg_color="transparent")
-        row1.pack(fill="x", pady=(0, 12))
+        row1.pack(fill="x", padx=20, pady=(16, 0))
         row1.columnconfigure(0, weight=3)
         row1.columnconfigure(1, weight=2)
 
+        # Card IPK
         card_ipk = self._card(row1)
-        card_ipk.grid(row=0, column=0, padx=(0, 8), sticky="nsew")
-        ctk.CTkLabel(card_ipk, text="Distribusi Rentang IPK",
-                     font=F_SUBJUDUL, text_color=C["teks"]).pack(padx=16, pady=(14, 6), anchor="w")
-        self._canvas_ipk = tk.Canvas(card_ipk, height=220,
+        card_ipk.grid(row=0, column=0, padx=(0, 8), sticky="nsew", pady=(0, 14))
+        self._card_header(card_ipk, "📊", "Distribusi Rentang IPK",
+                          "Jumlah mahasiswa per rentang IPK")
+        self._canvas_ipk = tk.Canvas(card_ipk, height=210,
                                      bg=C["putih"], highlightthickness=0)
-        self._canvas_ipk.pack(fill="x", padx=16, pady=(0, 14))
+        self._canvas_ipk.pack(fill="x", padx=16, pady=(0, 4))
+        # Footer mini stat di bawah bar
+        self._ipk_footer = ctk.CTkFrame(card_ipk, fg_color="transparent")
+        self._ipk_footer.pack(fill="x", padx=16, pady=(0, 14))
 
+        # Card Predikat
         card_pred = self._card(row1)
-        card_pred.grid(row=0, column=1, padx=(8, 0), sticky="nsew")
-        ctk.CTkLabel(card_pred, text="Sebaran Predikat",
-                     font=F_SUBJUDUL, text_color=C["teks"]).pack(padx=16, pady=(14, 6), anchor="w")
-        self._canvas_pred = tk.Canvas(card_pred, height=220,
+        card_pred.grid(row=0, column=1, padx=(8, 0), sticky="nsew", pady=(0, 14))
+        self._card_header(card_pred, "🥧", "Sebaran Predikat",
+                          "Sebaran predikat mahasiswa")
+        self._canvas_pred = tk.Canvas(card_pred, height=210,
                                       bg=C["putih"], highlightthickness=0)
-        self._canvas_pred.pack(fill="x", padx=16, pady=(0, 14))
+        self._canvas_pred.pack(fill="x", padx=16, pady=(0, 4))
+        # Footer total mahasiswa di bawah pie
+        self._pred_footer = ctk.CTkFrame(card_pred, fg_color="transparent")
+        self._pred_footer.pack(fill="x", padx=16, pady=(0, 14))
 
-        # Row 2: rata-rata IPS per semester (line)
+        # ── ROW 2: Line IPS per semester (full width) ───────────────────
         card_ips = self._card(scroll)
-        card_ips.pack(fill="x", pady=(0, 12))
-        ctk.CTkLabel(card_ips, text="Rata-rata IPS per Semester",
-                     font=F_SUBJUDUL, text_color=C["teks"]).pack(padx=16, pady=(14, 6), anchor="w")
-        self._canvas_ips = tk.Canvas(card_ips, height=200,
+        card_ips.pack(fill="x", **pad)
+        self._card_header(card_ips, "📈", "Rata-rata IPS per Semester",
+                          "Tren rata-rata IPS per semester")
+        self._canvas_ips = tk.Canvas(card_ips, height=190,
                                      bg=C["putih"], highlightthickness=0)
         self._canvas_ips.pack(fill="x", padx=16, pady=(0, 14))
 
-        # Row 3: distribusi grade per semester (column)
-        card_grade = self._card(scroll)
-        card_grade.pack(fill="x", pady=(0, 12))
-        ctk.CTkLabel(card_grade, text="Distribusi Grade (Semua Mata Kuliah)",
-                     font=F_SUBJUDUL, text_color=C["teks"]).pack(padx=16, pady=(14, 6), anchor="w")
+        # ── ROW 3: Column Grade (weight 3) + Ringkasan (weight 2) ──────
+        row3 = ctk.CTkFrame(scroll, fg_color="transparent")
+        row3.pack(fill="x", padx=20, pady=(0, 20))
+        row3.columnconfigure(0, weight=3)
+        row3.columnconfigure(1, weight=2)
+
+        card_grade = self._card(row3)
+        card_grade.grid(row=0, column=0, padx=(0, 8), sticky="nsew")
+        self._card_header(card_grade, "🏆", "Distribusi Grade (Semua Mata Kuliah)",
+                          "Distribusi grade seluruh mata kuliah")
         self._canvas_grade = tk.Canvas(card_grade, height=200,
                                        bg=C["putih"], highlightthickness=0)
         self._canvas_grade.pack(fill="x", padx=16, pady=(0, 14))
 
-        # Row 4: ringkasan teks
-        card_sum = self._card(scroll)
-        card_sum.pack(fill="x", pady=(0, 12))
-        ctk.CTkLabel(card_sum, text="Ringkasan Statistik",
-                     font=F_SUBJUDUL, text_color=C["teks"]).pack(padx=16, pady=(14, 6), anchor="w")
+        # Card Ringkasan Statistik
+        card_sum = self._card(row3)
+        card_sum.grid(row=0, column=1, padx=(8, 0), sticky="nsew")
+        self._card_header(card_sum, "📋", "Ringkasan Statistik", "")
         self._sum_frame = ctk.CTkFrame(card_sum, fg_color="transparent")
-        self._sum_frame.pack(fill="x", padx=16, pady=(0, 14))
+        self._sum_frame.pack(fill="both", expand=True, padx=16, pady=(0, 14))
 
         self.refresh()
 
-    def _get_data(self):
-        """Ambil dan hitung semua data statistik sekali jalan."""
-        semua = db.get_semua()
-        filter_smt = self._filter_smt.get()
+    # ------------------------------------------------------------------
+    # Helper: Card header dengan ikon
+    # ------------------------------------------------------------------
+    def _card_header(self, card, icon: str, title: str, subtitle: str):
+        hdr = ctk.CTkFrame(card, fg_color="transparent")
+        hdr.pack(fill="x", padx=16, pady=(14, 6))
+        # ikon dalam kotak oranye muda
+        icon_box = ctk.CTkFrame(hdr, fg_color=C["oranye_muda"],
+                                corner_radius=8, width=34, height=34)
+        icon_box.pack(side="left", padx=(0, 10))
+        icon_box.pack_propagate(False)
+        ctk.CTkLabel(icon_box, text=icon,
+                     font=("Segoe UI Emoji", 15)).place(relx=0.5, rely=0.5, anchor="center")
+        txt = ctk.CTkFrame(hdr, fg_color="transparent")
+        txt.pack(side="left")
+        ctk.CTkLabel(txt, text=title, font=("Segoe UI", 12, "bold"),
+                     text_color=C["teks"]).pack(anchor="w")
+        if subtitle:
+            ctk.CTkLabel(txt, text=subtitle, font=("Segoe UI", 8),
+                         text_color=C["teks_sub"]).pack(anchor="w")
 
-        # Kumpulkan semua IPK
+    # ------------------------------------------------------------------
+    # DATA
+    # ------------------------------------------------------------------
+    def _get_data(self):
+        semua = db.get_semua()
+        fs = self._filter_smt.get()
+        filter_smt = "Semua" if fs == "Semua Semester" else fs
+
         ipk_list = []
         for m in semua:
             if not m["semester"]:
                 continue
-            if filter_smt != "Semua":
-                if filter_smt not in m["semester"]:
-                    continue
+            if filter_smt != "Semua" and filter_smt not in m["semester"]:
+                continue
             ipk_list.append(db.ipk_mahasiswa(m))
 
-        # Distribusi rentang IPK
         rentang = [
-            ("0.00 - 1.99", 0),
-            ("2.00 - 2.49", 0),
-            ("2.50 - 2.99", 0),
-            ("3.00 - 3.49", 0),
-            ("3.50 - 3.74", 0),
-            ("3.75 - 4.00", 0),
+            ("0.00-1.99", 0), ("2.00-2.49", 0), ("2.50-2.99", 0),
+            ("3.00-3.49", 0), ("3.50-3.74", 0), ("3.75-4.00", 0),
         ]
         for ipk in ipk_list:
-            if ipk < 2.0:
-                rentang[0] = (rentang[0][0], rentang[0][1] + 1)
-            elif ipk < 2.5:
-                rentang[1] = (rentang[1][0], rentang[1][1] + 1)
-            elif ipk < 3.0:
-                rentang[2] = (rentang[2][0], rentang[2][1] + 1)
-            elif ipk < 3.5:
-                rentang[3] = (rentang[3][0], rentang[3][1] + 1)
-            elif ipk < 3.75:
-                rentang[4] = (rentang[4][0], rentang[4][1] + 1)
-            else:
-                rentang[5] = (rentang[5][0], rentang[5][1] + 1)
+            if   ipk < 2.0:  rentang[0] = (rentang[0][0], rentang[0][1] + 1)
+            elif ipk < 2.5:  rentang[1] = (rentang[1][0], rentang[1][1] + 1)
+            elif ipk < 3.0:  rentang[2] = (rentang[2][0], rentang[2][1] + 1)
+            elif ipk < 3.5:  rentang[3] = (rentang[3][0], rentang[3][1] + 1)
+            elif ipk < 3.75: rentang[4] = (rentang[4][0], rentang[4][1] + 1)
+            else:            rentang[5] = (rentang[5][0], rentang[5][1] + 1)
 
-        # Distribusi predikat
         pred_dist = {"Cumlaude": 0, "Sangat Baik": 0, "Baik": 0,
                      "Cukup": 0, "Perlu Perbaikan": 0}
         for ipk in ipk_list:
             p = db.predikat(ipk)
             pred_dist[p] = pred_dist.get(p, 0) + 1
 
-        # Rata-rata IPS per semester
-        ips_per_smt = {}  # {smt: [ips, ...]}
-        grade_dist  = {}  # {grade: count}
+        ips_per_smt = {}
+        grade_dist  = {}
         for m in semua:
             for smt_key, mk_list in m["semester"].items():
                 if filter_smt != "Semua" and smt_key != filter_smt:
@@ -2045,93 +2231,129 @@ class HalamanStatistik(HalamanBase):
                     g = mk.get("grade", "E")
                     grade_dist[g] = grade_dist.get(g, 0) + 1
 
-        avg_ips = {}
-        for smt, vals in ips_per_smt.items():
-            avg_ips[smt] = round(sum(vals) / len(vals), 2)
+        avg_ips = {smt: round(sum(v) / len(v), 2) for smt, v in ips_per_smt.items()}
 
         return {
-            "ipk_list":  ipk_list,
-            "rentang":   rentang,
-            "pred_dist": pred_dist,
-            "avg_ips":   avg_ips,
+            "ipk_list":   ipk_list,
+            "rentang":    rentang,
+            "pred_dist":  pred_dist,
+            "avg_ips":    avg_ips,
             "grade_dist": grade_dist,
-            "total":     len(semua),
+            "total":      len(semua),
         }
 
+    # ------------------------------------------------------------------
+    # REFRESH
+    # ------------------------------------------------------------------
     def refresh(self, *_):
         data = self._get_data()
-
-        # Tunggu canvas siap (width bisa 0 sebelum render)
         self.update_idletasks()
 
-        # --- 1. Bar chart distribusi IPK ---
-        colors_ipk = [
-            C["merah"], C["kuning"], "#F59E0B",
-            C["oranye"], C["hijau"], "#059669"
-        ]
+        ipk_list = data["ipk_list"]
+        total    = data["total"]
+
+        # ── 1. Bar chart IPK ───────────────────────────────────────────
+        colors_ipk = [C["merah"], C["kuning"], "#F59E0B",
+                      C["oranye"], C["hijau"], "#059669"]
         Chart.bar(self._canvas_ipk, data["rentang"],
-                  colors=colors_ipk, title="Jumlah mahasiswa per rentang IPK")
+                  colors=colors_ipk, title="")
 
-        # --- 2. Pie chart predikat ---
-        pred_data = [(k, v) for k, v in data["pred_dist"].items() if v > 0]
+        # Footer di bawah bar: Total Mahasiswa | Rata-rata IPK
+        for w in self._ipk_footer.winfo_children():
+            w.destroy()
+        rata_ipk = f"{sum(ipk_list)/len(ipk_list):.2f}" if ipk_list else "0.00"
+        self._ipk_footer.columnconfigure((0, 1), weight=1)
+        for col, (lbl, val, ico, color) in enumerate([
+            ("Total Mahasiswa", str(total), "👥", C["oranye"]),
+            ("Rata-rata IPK",   rata_ipk,  "⭐", C["oranye"]),
+        ]):
+            box = ctk.CTkFrame(self._ipk_footer, fg_color=C["abu_card"],
+                               corner_radius=8)
+            box.grid(row=0, column=col,
+                     sticky="nsew", padx=4)
+            inner = ctk.CTkFrame(box, fg_color="transparent")
+            inner.pack(fill="x", padx=10, pady=8)
+            ctk.CTkLabel(inner, text=ico + "  " + lbl,
+                         font=("Segoe UI", 9), text_color=C["teks_sub"]).pack(anchor="w")
+            ctk.CTkLabel(inner, text=val,
+                         font=("Segoe UI", 18, "bold"),
+                         text_color=color).pack(anchor="w")
+
+        # ── 2. Pie chart predikat ──────────────────────────────────────
+        pred_data   = [(k, v) for k, v in data["pred_dist"].items() if v > 0]
         pred_colors = [C["ungu"], C["hijau"], C["oranye"], C["kuning"], C["merah"]]
-        Chart.pie(self._canvas_pred, pred_data,
-                  colors=pred_colors, title="Sebaran predikat mahasiswa")
+        Chart.pie(self._canvas_pred, pred_data, colors=pred_colors, title="")
 
-        # --- 3. Line chart rata-rata IPS per semester ---
-        smts = sorted(data["avg_ips"].keys(), key=int)
-        ips_vals = [data["avg_ips"][s] for s in smts]
-        smt_labels = [f"Smt {s}" for s in smts]
+        # Footer di bawah pie: Total Mahasiswa
+        for w in self._pred_footer.winfo_children():
+            w.destroy()
+        box_p = ctk.CTkFrame(self._pred_footer, fg_color=C["abu_card"],
+                             corner_radius=8)
+        box_p.pack(fill="x")
+        pi = ctk.CTkFrame(box_p, fg_color="transparent")
+        pi.pack(fill="x", padx=10, pady=8)
+        ctk.CTkLabel(pi, text="🎓  Total Mahasiswa",
+                     font=("Segoe UI", 9), text_color=C["teks_sub"]).pack(anchor="w")
+        ctk.CTkLabel(pi, text=str(total),
+                     font=("Segoe UI", 18, "bold"),
+                     text_color=C["oranye"]).pack(anchor="w")
+
+        # ── 3. Line chart IPS ─────────────────────────────────────────
+        smts      = sorted(data["avg_ips"].keys(), key=int)
+        ips_vals  = [data["avg_ips"][s] for s in smts]
+        smt_lbls  = [f"Smt {s}" for s in smts]
         if len(ips_vals) >= 2:
             Chart.line(self._canvas_ips,
                        datasets=[("Rata-rata IPS", C["oranye"], ips_vals)],
-                       labels=smt_labels,
-                       title="Tren rata-rata IPS per semester")
+                       labels=smt_lbls, title="")
         else:
             self._canvas_ips.delete("all")
             self._canvas_ips.update_idletasks()
-            w = self._canvas_ips.winfo_width() or 400
+            cw = self._canvas_ips.winfo_width() or 500
             self._canvas_ips.create_text(
-                w // 2, 100,
+                cw // 2, 95,
                 text="Butuh minimal 2 semester untuk menampilkan tren.",
                 fill=C["teks_sub"], font=F_KECIL
             )
 
-        # --- 4. Column chart distribusi grade ---
-        grade_order = ["A", "A-", "B+", "B", "B-", "C+", "C", "D", "E"]
-        grade_data = [(g, data["grade_dist"].get(g, 0)) for g in grade_order
-                      if data["grade_dist"].get(g, 0) > 0]
-        grade_colors = [
-            "#059669", "#16A34A", "#22C55E", "#4ADE80", "#86EFAC",
-            "#F59E0B", "#D97706", "#EA580C", "#DC2626"
-        ]
+        # ── 4. Column chart grade ─────────────────────────────────────
+        grade_order  = ["A", "A-", "B+", "B", "B-", "C+", "C", "D", "E"]
+        grade_data   = [(g, data["grade_dist"].get(g, 0)) for g in grade_order
+                        if data["grade_dist"].get(g, 0) > 0]
+        grade_colors = ["#059669","#16A34A","#22C55E","#4ADE80","#86EFAC",
+                        "#F59E0B","#D97706","#EA580C","#DC2626"]
         Chart.column(self._canvas_grade, grade_data,
-                     colors=grade_colors[:len(grade_data)],
-                     title="Distribusi grade seluruh mata kuliah")
+                     colors=grade_colors[:len(grade_data)], title="")
 
-        # --- 5. Ringkasan teks ---
+        # ── 5. Ringkasan Statistik (card kanan bawah) ─────────────────
         for w in self._sum_frame.winfo_children():
             w.destroy()
 
-        ipk_list = data["ipk_list"]
         stats = [
-            ("Mahasiswa dengan nilai",    str(len(ipk_list)),                    C["oranye"]),
-            ("Rata-rata IPK",             f"{sum(ipk_list)/len(ipk_list):.2f}" if ipk_list else "0.00", C["oranye"]),
-            ("IPK tertinggi",             f"{max(ipk_list):.2f}" if ipk_list else "0.00", C["hijau"]),
-            ("IPK terendah",              f"{min(ipk_list):.2f}" if ipk_list else "0.00", C["merah"]),
-            ("Total mahasiswa terdaftar", str(data["total"]),                    C["teks"]),
+            ("Mahasiswa\ndengan nilai",    str(len(ipk_list)),   "👥", C["oranye"]),
+            ("Rata-rata IPK",              rata_ipk,             "📈", C["oranye"]),
+            ("IPK tertinggi",
+             f"{max(ipk_list):.2f}" if ipk_list else "0.00",    "⬆️", C["hijau"]),
+            ("IPK terendah",
+             f"{min(ipk_list):.2f}" if ipk_list else "0.00",    "⬇️", C["merah"]),
+            ("Total mahasiswa\nterdaftar", str(total),           "🏫", C["teks"]),
         ]
 
-        self._sum_frame.columnconfigure(tuple(range(len(stats))), weight=1, uniform="s")
-        for col, (label, val, color) in enumerate(stats):
+        self._sum_frame.columnconfigure((0, 1), weight=1, uniform="s")
+        for idx, (label, val, ico, color) in enumerate(stats):
+            row_g = idx // 2
+            col_g = idx % 2
             box = ctk.CTkFrame(self._sum_frame, fg_color=C["abu_card"],
                                corner_radius=10)
-            box.grid(row=0, column=col, padx=6, sticky="nsew")
-            ctk.CTkLabel(box, text=label, font=("Segoe UI", 8),
-                         text_color=C["teks_sub"]).pack(padx=12, pady=(10, 2), anchor="w")
-            ctk.CTkLabel(box, text=val,
-                         font=("Segoe UI", 20, "bold"),
-                         text_color=color).pack(padx=12, pady=(0, 10), anchor="w")
+            box.grid(row=row_g, column=col_g, padx=4, pady=4, sticky="nsew")
+            inner_b = ctk.CTkFrame(box, fg_color="transparent")
+            inner_b.pack(fill="x", padx=12, pady=10)
+            ctk.CTkLabel(inner_b, text=ico + "  " + label,
+                         font=("Segoe UI", 8), text_color=C["teks_sub"],
+                         justify="left", anchor="w").pack(anchor="w")
+            ctk.CTkLabel(inner_b, text=val,
+                         font=("Segoe UI", 22, "bold"),
+                         text_color=color).pack(anchor="w")
 
 
 # ============================================================
@@ -2189,7 +2411,7 @@ class HalamanRiwayat(HalamanBase):
 #============================================================
 #HALAMAN LOGIN - UPDATED UI
 #============================================================
-    
+
 
 class HalamanLogin(ctk.CTkFrame):
 
@@ -2481,6 +2703,493 @@ class HalamanLogin(ctk.CTkFrame):
             )
 
 # ============================================================
+# HALAMAN KALENDER AKADEMIK
+# ============================================================
+
+class HalamanJadwalAkademik(ctk.CTkFrame):
+    """
+    Halaman Kalender Akademik — menampilkan jadwal kegiatan akademik
+    per semester dengan tampilan accordion / collapsible.
+    """
+
+    # ----------------------------------------------------------------
+    # Data Kalender Akademik 2025/2026
+    # ----------------------------------------------------------------
+    DATA_KALENDER = {
+        "Semester Ganjil": [
+            {
+                "icon": "👥",
+                "judul": "PENERIMAAN MAHASISWA",
+                "items": [
+                    {
+                        "nomor": 1,
+                        "nama": "Seleksi Nasional Berdasarkan Prestasi (SNBP)",
+                        "sub": [
+                            ("Pengisian PDSS",                           "06 Des 2024 – 03 Mar 2025"),
+                            ("Pendaftaran",                               "04 – 18 Feb 2025"),
+                            ("Pengumuman Kelulusan",                      "18 Mar 2025"),
+                        ]
+                    },
+                    {
+                        "nomor": 2,
+                        "nama": "Seleksi Nasional Berdasarkan Test (SNBT)",
+                        "sub": [
+                            ("Pendaftaran",                               "11 – 27 Mar 2025"),
+                            ("Pelaksanaan Tes UTBK",                      "23 Apr – 03 Mei 2025"),
+                            ("Pengumuman Kelulusan",                      "28 Mei 2025"),
+                        ]
+                    },
+                    {
+                        "nomor": 3,
+                        "nama": "Seleksi Mandiri Berdasarkan Nilai UTBK SNBT",
+                        "sub": [
+                            ("Pendaftaran",                               "01 Mei – 29 Jun 2025"),
+                        ]
+                    },
+                    {
+                        "nomor": 4,
+                        "nama": "Seleksi Mandiri Jalur Reguler (SM) dan Prestasi Istimewa (PI)",
+                        "sub": [
+                            ("Pendaftaran",                               "01 Mei – 29 Jun 2025"),
+                            ("Pelaksanaan UTBK",                          "01 – 03 Jul 2025"),
+                            ("Pelaksanaan Ujian Keterampilan dan/atau Wawancara", "04 – 07 Jul 2025"),
+                            ("Pengumuman Kelulusan",                      "18 Jul 2025"),
+                        ]
+                    },
+                    {
+                        "nomor": 5,
+                        "nama": "Pascasarjana (S2 dan S3)",
+                        "sub": [
+                            ("Pendaftaran",                               "08 Apr – 05 Mei 2025"),
+                            ("Pelaksanaan Tes",                           "15 – 16 Mei 2025"),
+                            ("Pengumuman",                                "21 Mei 2025"),
+                        ]
+                    },
+                ]
+            },
+            {
+                "icon": "📋",
+                "judul": "REGISTRASI",
+                "items": [
+                    {
+                        "nomor": 1,
+                        "nama": "Pembayaran UKT/Biaya Pendidikan",
+                        "sub": [
+                            ("Mahasiswa Baru Jalur SNBP",                 "23 Apr – 30 Mei 2025"),
+                            ("Mahasiswa Lama (D4, S1, S2, dan S3)",       "22 Jun – 31 Jul 2025"),
+                            ("Mahasiswa Baru S2 dan S3",                  "18 – 21 Agu 2025"),
+                            ("Mahasiswa Baru Jalur SNBT",                 "23 Jun – 08 Jul 2025"),
+                            ("Mahasiswa Baru Jalur Seleksi Mandiri (SM dan PI)", "10 – 20 Agu 2025"),
+                        ]
+                    },
+                    {
+                        "nomor": 2,
+                        "nama": "Verifikasi Data Mahasiswa Baru",
+                        "sub": [
+                            ("Jalur SNBP",                                "30 Mei – 02 Jun 2025"),
+                            ("Jalur SNBT dan Pascasarjana (S2 dan S3)",   "14 – 18 Agu 2025"),
+                            ("Jalur SMM PTN Barat",                       "22 – 24 Agu 2025"),
+                            ("Jalur Seleksi Mandiri (SM dan PI)",         "25 – 27 Agu 2025"),
+                        ]
+                    },
+                    {
+                        "nomor": 3,
+                        "nama": "Kuliah Umum dan Pra Perkuliahan",
+                        "sub": [
+                            ("Pelaksanaan",                               "25 – 29 Agu 2025"),
+                        ]
+                    },
+                    {
+                        "nomor": 4,
+                        "nama": "Pengisian Isian Rencana IRS dan Perwalian",
+                        "sub": [
+                            ("Mahasiswa Baru",                            "25 – 29 Agu 2025"),
+                            ("Mahasiswa Lama",                            "26 – 29 Agu 2025"),
+                        ]
+                    },
+                    {
+                        "nomor": 5,
+                        "nama": "Perubahan Rencana Studi",
+                        "sub": [
+                            ("Pelaksanaan",                               "01 – 05 Sep 2025"),
+                        ]
+                    },
+                ]
+            },
+            {
+                "icon": "🎓",
+                "judul": "PERKULIAHAN",
+                "items": [
+                    {
+                        "nomor": 1,
+                        "nama": "Perkuliahan Semester Ganjil",
+                        "sub": [
+                            ("Mulai Perkuliahan",                         "01 Sep 2025"),
+                            ("Akhir Perkuliahan",                         "31 Jan 2026"),
+                        ]
+                    },
+                ]
+            },
+            {
+                "icon": "📝",
+                "judul": "UJIAN DAN PEMASUKAN NILAI",
+                "items": [
+                    {
+                        "nomor": 1,
+                        "nama": "Ujian Tengah Semester (UTS)",
+                        "sub": [
+                            ("Pelaksanaan",                               "20 Okt – 01 Nov 2025"),
+                        ]
+                    },
+                    {
+                        "nomor": 2,
+                        "nama": "Ujian Akhir Semester",
+                        "sub": [
+                            ("Pelaksanaan",                               "19 Jan – 31 Jan 2026"),
+                        ]
+                    },
+                    {
+                        "nomor": 3,
+                        "nama": "Pemeriksaan dan Pemasukan Nilai UAS",
+                        "sub": [
+                            ("Pelaksanaan",                               "01 – 14 Feb 2026"),
+                        ]
+                    },
+                ]
+            },
+            {
+                "icon": "🌿",
+                "judul": "CUTI AKADEMIK",
+                "items": [
+                    {
+                        "nomor": 1,
+                        "nama": "Pengajuan",
+                        "sub": [
+                            ("Batas Akhir Pengajuan",                     "05 Sep 2025"),
+                        ]
+                    },
+                    {
+                        "nomor": 2,
+                        "nama": "Pengaktifan Kembali",
+                        "sub": [
+                            ("Batas Akhir Pengajuan",                     "29 Agu 2025"),
+                        ]
+                    },
+                ]
+            },
+        ],
+        "Semester Genap": [
+            {
+                "icon": "🎓",
+                "judul": "PERKULIAHAN",
+                "items": [
+                    {
+                        "nomor": 1,
+                        "nama": "Perkuliahan Semester Genap",
+                        "sub": [
+                            ("Mulai Perkuliahan",                         "16 Feb 2026"),
+                            ("Akhir Perkuliahan",                         "30 Jun 2026"),
+                        ]
+                    },
+                ]
+            },
+            {
+                "icon": "📝",
+                "judul": "UJIAN DAN PEMASUKAN NILAI",
+                "items": [
+                    {
+                        "nomor": 1,
+                        "nama": "Ujian Tengah Semester (UTS)",
+                        "sub": [
+                            ("Pelaksanaan",                               "06 – 17 Apr 2026"),
+                        ]
+                    },
+                    {
+                        "nomor": 2,
+                        "nama": "Ujian Akhir Semester",
+                        "sub": [
+                            ("Pelaksanaan",                               "15 – 30 Jun 2026"),
+                        ]
+                    },
+                ]
+            },
+        ],
+        "Semester Padat": [
+            {
+                "icon": "🎓",
+                "judul": "PERKULIAHAN",
+                "items": [
+                    {
+                        "nomor": 1,
+                        "nama": "Perkuliahan Semester Padat",
+                        "sub": [
+                            ("Mulai Perkuliahan",                         "13 Jul 2026"),
+                            ("Akhir Perkuliahan",                         "22 Agu 2026"),
+                        ]
+                    },
+                ]
+            },
+        ],
+        "Wisuda": [
+            {
+                "icon": "🏅",
+                "judul": "WISUDA",
+                "items": [
+                    {
+                        "nomor": 1,
+                        "nama": "Wisuda Periode I",
+                        "sub": [
+                            ("Pendaftaran Wisuda",                        "20 Okt – 14 Nov 2025"),
+                            ("Pelaksanaan Wisuda",                        "20 Nov 2025"),
+                        ]
+                    },
+                    {
+                        "nomor": 2,
+                        "nama": "Wisuda Periode II",
+                        "sub": [
+                            ("Pendaftaran Wisuda",                        "23 Feb – 20 Mar 2026"),
+                            ("Pelaksanaan Wisuda",                        "26 Mar 2026"),
+                        ]
+                    },
+                    {
+                        "nomor": 3,
+                        "nama": "Wisuda Periode III",
+                        "sub": [
+                            ("Pendaftaran Wisuda",                        "15 Jun – 10 Jul 2026"),
+                            ("Pelaksanaan Wisuda",                        "16 Jul 2026"),
+                        ]
+                    },
+                ]
+            },
+        ],
+    }
+
+    def __init__(self, parent):
+        super().__init__(parent, fg_color="transparent", corner_radius=0)
+        self._semester_aktif = "Semester Ganjil"
+        self._tab_btns = {}
+        self._collapse_state = {}   # key -> bool (True = collapsed)
+        self._build()
+
+    def _build(self):
+        # ── Header ──────────────────────────────────────────────────
+        hdr = ctk.CTkFrame(self, fg_color="transparent")
+        hdr.pack(fill="x", pady=(0, 16))
+
+        icon_frame = ctk.CTkFrame(hdr, width=48, height=48,
+                                  corner_radius=12,
+                                  fg_color=C["oranye_muda"])
+        icon_frame.pack(side="left")
+        icon_frame.pack_propagate(False)
+        ctk.CTkLabel(icon_frame, text="📅",
+                     font=("Segoe UI Emoji", 22)).place(relx=.5, rely=.5, anchor="center")
+
+        teks_hdr = ctk.CTkFrame(hdr, fg_color="transparent")
+        teks_hdr.pack(side="left", padx=14)
+        ctk.CTkLabel(teks_hdr, text="Kalender Akademik",
+                     font=F_JUDUL, text_color=C["teks"]).pack(anchor="w")
+        ctk.CTkLabel(teks_hdr, text="Informasi jadwal kegiatan akademik Tahun Akademik 2025/2026",
+                     font=F_NORMAL, text_color=C["teks_sub"]).pack(anchor="w")
+
+        # ── Tahun akademik label ─────────────────────────────────────
+        ta_frame = ctk.CTkFrame(self, fg_color=C["putih"], corner_radius=12)
+        ta_frame.pack(fill="x", pady=(0, 12))
+        ctk.CTkLabel(ta_frame, text="Tahun Akademik 2025/2026",
+                     font=F_SUBJUDUL, text_color=C["teks"]).pack(anchor="w", padx=20, pady=14)
+
+        # ── Tab semester ─────────────────────────────────────────────
+        tab_bar = ctk.CTkFrame(self, fg_color=C["putih"], corner_radius=12)
+        tab_bar.pack(fill="x", pady=(0, 16))
+
+        tabs_inner = ctk.CTkFrame(tab_bar, fg_color="transparent")
+        tabs_inner.pack(side="left", padx=12, pady=8)
+
+        for sem in self.DATA_KALENDER.keys():
+            btn = ctk.CTkButton(
+                tabs_inner,
+                text=sem,
+                width=140,
+                height=36,
+                corner_radius=8,
+                fg_color="transparent",
+                hover_color=C["oranye_muda"],
+                text_color=C["teks_sub"],
+                font=("Segoe UI", 12),
+                command=lambda s=sem: self._ganti_tab(s)
+            )
+            btn.pack(side="left", padx=4)
+            self._tab_btns[sem] = btn
+
+        # ── Scrollable content area ──────────────────────────────────
+        self._scroll = ctk.CTkScrollableFrame(
+            self,
+            fg_color="transparent",
+            corner_radius=0
+        )
+        self._scroll.pack(fill="both", expand=True)
+
+        # Render tab aktif
+        self._render_tab(self._semester_aktif)
+        self._set_tab_aktif(self._semester_aktif)
+
+    def _ganti_tab(self, semester: str):
+        if semester == self._semester_aktif:
+            return
+        self._semester_aktif = semester
+        self._set_tab_aktif(semester)
+        self._render_tab(semester)
+
+    def _set_tab_aktif(self, semester: str):
+        for s, btn in self._tab_btns.items():
+            if s == semester:
+                btn.configure(
+                    fg_color=C["oranye"],
+                    hover_color=C["oranye_gelap"],
+                    text_color=C["putih"],
+                    font=("Segoe UI", 12, "bold")
+                )
+            else:
+                btn.configure(
+                    fg_color="transparent",
+                    hover_color=C["oranye_muda"],
+                    text_color=C["teks_sub"],
+                    font=("Segoe UI", 12)
+                )
+
+    def _render_tab(self, semester: str):
+        # Hapus konten lama
+        for w in self._scroll.winfo_children():
+            w.destroy()
+        self._collapse_state.clear()
+
+        seksi_list = self.DATA_KALENDER.get(semester, [])
+        for seksi in seksi_list:
+            self._buat_seksi(seksi)
+
+    def _buat_seksi(self, seksi: dict):
+        # ── Section header (icon + judul) ────────────────────────────
+        sec_frame = ctk.CTkFrame(self._scroll, fg_color=C["putih"],
+                                 corner_radius=14)
+        sec_frame.pack(fill="x", pady=(0, 16))
+
+        sec_hdr = ctk.CTkFrame(sec_frame, fg_color="transparent")
+        sec_hdr.pack(fill="x", padx=18, pady=14)
+
+        icon_box = ctk.CTkFrame(sec_hdr, width=36, height=36,
+                                corner_radius=8,
+                                fg_color=C["oranye_muda"])
+        icon_box.pack(side="left")
+        icon_box.pack_propagate(False)
+        ctk.CTkLabel(icon_box, text=seksi["icon"],
+                     font=("Segoe UI Emoji", 16)).place(relx=.5, rely=.5, anchor="center")
+
+        ctk.CTkLabel(sec_hdr, text=seksi["judul"],
+                     font=("Segoe UI", 13, "bold"),
+                     text_color=C["teks"]).pack(side="left", padx=12)
+
+        # ── Accordion items ─────────────────────────────────────────
+        for item in seksi["items"]:
+            self._buat_accordion(sec_frame, item)
+
+    def _buat_accordion(self, parent, item: dict):
+        uid = f"{item['nomor']}_{item['nama'][:20]}"
+        self._collapse_state[uid] = False  # mulai terbuka
+
+        # ── Card wrapper ─────────────────────────────────────────────
+        card = ctk.CTkFrame(parent,
+                            fg_color=C["putih"],
+                            corner_radius=10,
+                            border_width=1,
+                            border_color="#F0F0F0")
+        card.pack(fill="x", padx=16, pady=(0, 10))
+
+        # ── Header accordion (clickable) ─────────────────────────────
+        hdr_frame = ctk.CTkFrame(card, fg_color="transparent")
+        hdr_frame.pack(fill="x")
+
+        # Badge nomor
+        badge = ctk.CTkFrame(hdr_frame, width=28, height=28,
+                             corner_radius=14,
+                             fg_color=C["oranye"])
+        badge.pack(side="left", padx=(12, 0), pady=12)
+        badge.pack_propagate(False)
+        ctk.CTkLabel(badge,
+                     text=str(item["nomor"]),
+                     font=("Segoe UI", 10, "bold"),
+                     text_color=C["putih"]).place(relx=.5, rely=.5, anchor="center")
+
+        # Judul item
+        lbl_nama = ctk.CTkLabel(
+            hdr_frame,
+            text=item["nama"],
+            font=("Segoe UI", 12, "bold"),
+            text_color=C["teks"],
+            anchor="w"
+        )
+        lbl_nama.pack(side="left", padx=10, pady=12, fill="x", expand=True)
+
+        # Toggle button
+        lbl_toggle = ctk.CTkLabel(
+            hdr_frame,
+            text="∧",
+            font=("Segoe UI", 14, "bold"),
+            text_color=C["teks_sub"]
+        )
+        lbl_toggle.pack(side="right", padx=14)
+
+        # ── Body sub-items ─────────────────────────────────────────
+        body = ctk.CTkFrame(card, fg_color="transparent")
+        body.pack(fill="x")
+
+        # Divider
+        div = ctk.CTkFrame(body, height=1, fg_color=C["abu_border"])
+        div.pack(fill="x", padx=12)
+
+        for nama_sub, tanggal in item["sub"]:
+            row = ctk.CTkFrame(body, fg_color="transparent")
+            row.pack(fill="x", padx=24, pady=3)
+
+            # Bullet
+            ctk.CTkLabel(row, text="●",
+                         font=("Segoe UI", 8),
+                         text_color=C["oranye"]).pack(side="left")
+
+            ctk.CTkLabel(row, text=nama_sub,
+                         font=F_NORMAL,
+                         text_color=C["teks"],
+                         anchor="w").pack(side="left", padx=8, fill="x", expand=True)
+
+            # Tanggal dengan icon
+            tgl_frame = ctk.CTkFrame(row, fg_color=C["oranye_muda"],
+                                     corner_radius=6)
+            tgl_frame.pack(side="right", pady=2)
+            ctk.CTkLabel(tgl_frame,
+                         text=f"📅  {tanggal}",
+                         font=("Segoe UI", 10),
+                         text_color=C["oranye"]).pack(padx=8, pady=3)
+
+        ctk.CTkFrame(body, height=6, fg_color="transparent").pack()
+
+        # ── Toggle logic ─────────────────────────────────────────────
+        def toggle(e=None, _uid=uid, _body=body, _lbl=lbl_toggle):
+            self._collapse_state[_uid] = not self._collapse_state[_uid]
+            if self._collapse_state[_uid]:
+                _body.pack_forget()
+                _lbl.configure(text="∨")
+            else:
+                _body.pack(fill="x")
+                _lbl.configure(text="∧")
+
+        hdr_frame.bind("<Button-1>", toggle)
+        lbl_nama.bind("<Button-1>", toggle)
+        lbl_toggle.bind("<Button-1>", toggle)
+        badge.bind("<Button-1>", toggle)
+
+    def refresh(self):
+        pass   # Tidak perlu fetch DB
+
+
+# ============================================================
 # APLIKASI UTAMA
 # ============================================================
 
@@ -2634,6 +3343,7 @@ class App(ctk.CTk):
         # =====================================================
         # HALAMAN
         # =====================================================
+        self._beranda = HalamanBeranda(self._area)
         self._dash = HalamanDashboard(self._area)
         self._mhs = HalamanMahasiswa(
             self._area,
@@ -2645,6 +3355,7 @@ class App(ctk.CTk):
         )
         self._statistik = HalamanStatistik(self._area)
         self._riwayat = HalamanRiwayat(self._area)
+        self._jadwal_akademik = HalamanJadwalAkademik(self._area)
 
         self._halaman_aktif = None
 
@@ -2655,11 +3366,13 @@ class App(ctk.CTk):
             return
 
         mapping = {
-            "dashboard":  self._dash,
-            "mahasiswa":  self._mhs,
-            "nilai":      self._nilai,
-            "statistik":  self._statistik,
-            "riwayat":    self._riwayat,
+            "beranda":          self._beranda,
+            "dashboard":        self._dash,
+            "mahasiswa":        self._mhs,
+            "nilai":            self._nilai,
+            "statistik":        self._statistik,
+            "riwayat":          self._riwayat,
+            "jadwal_akademik":  self._jadwal_akademik,
         }
 
         target = mapping.get(key)
@@ -2672,6 +3385,7 @@ class App(ctk.CTk):
         target.pack(fill="both", expand=True)
         self._halaman_aktif = target
 
+        if key == "beranda":     self._beranda.refresh()
         if key == "dashboard":   self._dash.refresh()
         if key == "mahasiswa":   self._mhs.refresh()
         if key == "statistik":   self._statistik.refresh()
