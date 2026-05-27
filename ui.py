@@ -465,7 +465,7 @@ class Sidebar(ctk.CTkFrame):
             self,
             fg_color="transparent"
         )
-        top.pack(fill="x", padx=24, pady=(28, 20))
+        top.pack(fill="x", padx=24, pady=(28, 10))
 
         logo = ctk.CTkImage(
             light_image=Image.open("assets/logo-graduation.png"),
@@ -499,6 +499,19 @@ class Sidebar(ctk.CTkFrame):
             font=("Segoe UI", 11),
             text_color="#78716C"
         ).pack(anchor="w")
+
+        # ====================================================
+        # SCROLLABLE MENU AREA
+        # ====================================================
+
+        self.menu_scroll = ctk.CTkScrollableFrame(
+            self,
+            fg_color="transparent",
+            corner_radius=0,
+            scrollbar_button_hover_color="#D1D5DB",
+            scrollbar_button_color="#FFFFFF"
+        )
+        self.menu_scroll.pack(fill="both", expand=True, padx=0, pady=0)
 
         # ====================================================
         # MENU
@@ -555,7 +568,7 @@ class Sidebar(ctk.CTkFrame):
         self._section("SISTEM")
 
         logout = ctk.CTkButton(
-            self,
+            self.menu_scroll,
             text="↪ Logout",
             anchor="w",
             height=48,
@@ -578,7 +591,7 @@ class Sidebar(ctk.CTkFrame):
 
         if text:
             ctk.CTkLabel(
-                self,
+                self.menu_scroll,
                 text=text,
                 font=("Segoe UI", 11, "bold"),
                 text_color="#A1A1AA"
@@ -587,7 +600,7 @@ class Sidebar(ctk.CTkFrame):
     def _menu_button(self, text, key, icon):
 
         btn = ctk.CTkButton(
-            self,
+            self.menu_scroll,
             text=f"{icon}   {text}",
             anchor="w",
             height=52,
