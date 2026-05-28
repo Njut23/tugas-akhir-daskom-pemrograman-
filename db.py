@@ -105,20 +105,80 @@ def predikat(ipk: float) -> str:
 # INISIALISASI FILE
 # ============================================================
 
+# Dosen pengampu bergilir per mata kuliah (6 dosen sesuai foto)
+_DOSEN_SEED = [
+    "Ibnu Hartopo, M.Pd.",
+    "Mariya Al Qibtiya, S.Si., M.T.",
+    "Nurul Fahmi Arief Hakim, S.Pd., M.T.",
+    "Resa Pramudita, S.Pd., M.T.",
+    "Roer Eka Pawinanto, S.Pd., M.Sc., Ph.D.",
+    "Silmi Ath Thahirah Al Azhima, S.T., M.T.",
+]
+
+
+def _seed_mata_kuliah(data: dict) -> bool:
+    """
+    Isi mata_kuliah dari KURIKULUM jika masih kosong.
+    Kode: SMT<semester>-<urutan>, contoh SMT1-01.
+    Dosen bergilir dari _DOSEN_SEED.
+    Kembalikan True jika ada perubahan.
+    """
+    if data.get("mata_kuliah"):
+        return False  # sudah ada isi, tidak overwrite
+
+    mklist = []
+    idx_dosen = 0
+    for smt, matkul_list in sorted(KURIKULUM.items()):
+        for urut, (nama, sks) in enumerate(matkul_list, start=1):
+            kode = f"SMT{smt}-{urut:02d}"
+            dosen = _DOSEN_SEED[idx_dosen % len(_DOSEN_SEED)]
+            idx_dosen += 1
+            mklist.append({
+                "kode":     kode,
+                "nama":     nama,
+                "prodi":    "",
+                "sks":      sks,
+                "semester": smt,
+                "dosen":    dosen,
+                "status":   "Aktif",
+            })
+    data["mata_kuliah"] = mklist
+    return True
+
+
 def init():
-    default = {"admin": {"username": "admin", "password": "123"}, "mahasiswa": [], "riwayat": []}
+    default = {
+        "admin": {"username": "admin", "password": "123"},
+        "mahasiswa": [],
+        "riwayat": [],
+        "mata_kuliah": [],
+    }
     if not os.path.exists(FILE):
-        _simpan(default)
+        _seed_mata_kuliah(default)
+        with open(FILE, "w", encoding="utf-8") as f:
+            json.dump(default, f, indent=2, ensure_ascii=False)
         return
-    # validasi format — reset kalau rusak
+    # File sudah ada: validasi format + seed jika mata_kuliah masih kosong
     try:
         data = _load()
+        changed = False
         if not isinstance(data.get("mahasiswa"), list):
-            raise ValueError
+            data["mahasiswa"] = []
+            changed = True
         if not isinstance(data.get("admin"), dict):
-            raise ValueError
+            data["admin"] = {"username": "admin", "password": "123"}
+            changed = True
+        if not isinstance(data.get("mata_kuliah"), list):
+            data["mata_kuliah"] = []
+            changed = True
+        if _seed_mata_kuliah(data):
+            changed = True
+        if changed:
+            _simpan(data)
     except Exception:
-        _simpan(default)
+        _seed_mata_kuliah(default)
+        with open(FILE, "w", encoding="utf-8") as f:
+            json.dump(default, f, indent=2, ensure_ascii=False)
 
 
 def _load() -> dict:
@@ -131,12 +191,18 @@ def _simpan(data: dict):
         json.dump(data, f, indent=2, ensure_ascii=False)
 
 
-def _log(aksi: str, detail: str):
+def _log(aksi: str, detail: str, operator: str = "Admin"):
+    """
+    aksi: kode aksi internal (TAMBAH, HAPUS, EDIT, NILAI, dll.)
+    detail: deskripsi lengkap
+    operator: nama pengguna yang melakukan aksi
+    """
     data = _load()
     data["riwayat"].insert(0, {
         "waktu": datetime.now().strftime("%d/%m/%Y %H:%M"),
         "aksi": aksi,
         "detail": detail,
+        "operator": operator,
     })
     data["riwayat"] = data["riwayat"][:20]
     _simpan(data)
@@ -277,6 +343,115 @@ def statistik() -> dict:
 
 def get_riwayat() -> list:
     return _load().get("riwayat", [])
+
+# ============================================================
+# MATA KULIAH — CRUD
+# ============================================================
+
+"""
+Struktur satu entri mata_kuliah:
+{
+    "kode":       "SMT1-01",
+    "nama":       "Pendidikan Agama Islam",
+    "prodi":      "",
+    "sks":        2,
+    "semester":   1,
+    "dosen":      "Ibnu Hartopo, M.Pd.",
+    "status":     "Aktif"   # "Aktif" | "Nonaktif"
+}
+"""
+
+
+def get_semua_mk() -> list:
+    return _load().get("mata_kuliah", [])
+
+
+def cari_mk(keyword: str) -> list:
+    kw = keyword.lower()
+    return [
+        mk for mk in get_semua_mk()
+        if kw in mk["kode"].lower()
+        or kw in mk["nama"].lower()
+        or kw in mk.get("dosen", "").lower()
+        or kw in mk.get("prodi", "").lower()
+    ]
+
+
+def tambah_mk(kode: str, nama: str, prodi: str, sks: int,
+              semester: int, dosen: str, status: str = "Aktif") -> bool:
+    kode = kode.strip().upper()
+    nama = nama.strip()
+    if not kode:
+        raise ValueError("Kode mata kuliah tidak boleh kosong.")
+    if not nama:
+        raise ValueError("Nama mata kuliah tidak boleh kosong.")
+    if not (1 <= sks <= 6):
+        raise ValueError("SKS harus antara 1–6.")
+    if not (1 <= semester <= 8):
+        raise ValueError("Semester harus antara 1–8.")
+    data = _load()
+    if any(mk["kode"] == kode for mk in data["mata_kuliah"]):
+        raise ValueError(f"Kode {kode} sudah terdaftar.")
+    data["mata_kuliah"].append({
+        "kode": kode, "nama": nama, "prodi": prodi,
+        "sks": sks, "semester": semester,
+        "dosen": dosen, "status": status,
+    })
+    _simpan(data)
+    _log("MK_TAMBAH", f"{nama} ({kode})")
+    return True
+
+
+def edit_mk(kode: str, nama: str, prodi: str, sks: int,
+            semester: int, dosen: str, status: str):
+    nama = nama.strip()
+    if not nama:
+        raise ValueError("Nama tidak boleh kosong.")
+    data = _load()
+    for mk in data["mata_kuliah"]:
+        if mk["kode"] == kode:
+            mk.update({"nama": nama, "prodi": prodi, "sks": sks,
+                        "semester": semester, "dosen": dosen, "status": status})
+            _simpan(data)
+            _log("MK_EDIT", f"{nama} ({kode})")
+            return
+    raise ValueError("Mata kuliah tidak ditemukan.")
+
+
+def hapus_mk(kode: str):
+    data = _load()
+    target = next((mk for mk in data["mata_kuliah"] if mk["kode"] == kode), None)
+    if not target:
+        raise ValueError("Mata kuliah tidak ditemukan.")
+    data["mata_kuliah"] = [mk for mk in data["mata_kuliah"] if mk["kode"] != kode]
+    _simpan(data)
+    _log("MK_HAPUS", f"{target['nama']} ({kode})")
+
+
+def toggle_status_mk(kode: str):
+    data = _load()
+    for mk in data["mata_kuliah"]:
+        if mk["kode"] == kode:
+            mk["status"] = "Nonaktif" if mk["status"] == "Aktif" else "Aktif"
+            _simpan(data)
+            _log("MK_STATUS", f"{mk['nama']} → {mk['status']}")
+            return
+    raise ValueError("Mata kuliah tidak ditemukan.")
+
+
+def statistik_mk() -> dict:
+    semua = get_semua_mk()
+    total_sks_mk = sum(mk["sks"] for mk in semua)
+    aktif = sum(1 for mk in semua if mk["status"] == "Aktif")
+    dosen_set = {mk["dosen"] for mk in semua if mk.get("dosen")}
+    smt_aktif = "Ganjil 2026/2027"
+    return {
+        "total":     len(semua),
+        "total_sks": total_sks_mk,
+        "aktif":     aktif,
+        "dosen":     len(dosen_set),
+        "smt_aktif": smt_aktif,
+    }
 
 # ============================================================
 # INISIALISASI SAAT IMPORT

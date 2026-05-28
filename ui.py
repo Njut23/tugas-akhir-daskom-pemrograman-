@@ -18,26 +18,112 @@ from PIL import Image, ImageTk
 ctk.set_appearance_mode("light")
 ctk.set_default_color_theme("blue")
 
-C = {
-    "oranye":       "#EA580C",
-    "oranye_gelap": "#C2410C",
-    "oranye_muda":  "#FFEDD5",
-    "oranye_aksen": "#F97316",
-    "putih":        "#FFFFFF",
-    "abu_bg":       "#FFFBF7",
-    "abu_card":     "#FFF7ED",
-    "abu_border":   "#FED7AA",
-    "teks":         "#1C1917",
-    "teks_sub":     "#78716C",
-    "hijau":        "#16A34A",
-    "hijau_muda":   "#DCFCE7",
-    "merah":        "#DC2626",
-    "merah_muda":   "#FEE2E2",
-    "kuning":       "#D97706",
-    "kuning_muda":  "#FEF3C7",
-    "ungu":         "#7C3AED",
-    "ungu_muda":    "#F5F3FF",
+# ── Palet warna per mode ──────────────────────────────────────
+_PALET = {
+    "light": {
+        "oranye":       "#EA580C",
+        "oranye_gelap": "#C2410C",
+        "oranye_muda":  "#FFEDD5",
+        "oranye_aksen": "#F97316",
+        "putih":        "#FFFFFF",
+        "abu_bg":       "#FFFBF7",
+        "abu_card":     "#FFF7ED",
+        "abu_border":   "#FED7AA",
+        "teks":         "#1C1917",
+        "teks_sub":     "#78716C",
+        "hijau":        "#16A34A",
+        "hijau_muda":   "#DCFCE7",
+        "merah":        "#DC2626",
+        "merah_muda":   "#FEE2E2",
+        "kuning":       "#D97706",
+        "kuning_muda":  "#FEF3C7",
+        "ungu":         "#7C3AED",
+        "ungu_muda":    "#F5F3FF",
+        # Sidebar
+        "sidebar_bg":         "#FFFFFF",
+        "sidebar_wrap":       "#C2410C",
+        "sidebar_teks":       "#52525B",
+        "sidebar_sub":        "#A1A1AA",
+        "sidebar_hover":      "#FFF1E8",
+        "sidebar_aktif":      "#FF6B00",
+        "sidebar_card":       "#FFFFFF",
+        "sidebar_card_border":"#F3F3F3",
+        "sidebar_card_teks":  "#1C1917",
+        "sidebar_card_sub":   "#78716C",
+        "sidebar_avatar_bg":  "#F3F4F6",
+        "sidebar_logout_hover":"#FEE2E2",
+        # Topbar
+        "topbar_bg":    "#FFF8F3",
+        "notif_bg":     "#FFFFFF",
+        "profile_bg":   "#FFFFFF",
+        "topbar_teks":  "#2B2B2B",
+        "topbar_sub":   "#78716C",
+        # Main
+        "main_bg":      "#FFF8F3",
+        "wrapper_bg":   "#FFF8F3",
+    },
+    "dark": {
+        "oranye":       "#EA580C",
+        "oranye_gelap": "#C2410C",
+        "oranye_muda":  "#3D1F0A",
+        "oranye_aksen": "#F97316",
+        "putih":        "#1E1E1E",
+        "abu_bg":       "#121212",
+        "abu_card":     "#1A1A1A",
+        "abu_border":   "#2E2E2E",
+        "teks":         "#E5E5E5",
+        "teks_sub":     "#A1A1AA",
+        "hijau":        "#22C55E",
+        "hijau_muda":   "#052E16",
+        "merah":        "#EF4444",
+        "merah_muda":   "#2D0A0A",
+        "kuning":       "#F59E0B",
+        "kuning_muda":  "#2A1900",
+        "ungu":         "#A78BFA",
+        "ungu_muda":    "#1A103D",
+        # Sidebar
+        "sidebar_bg":         "#1A1A1A",
+        "sidebar_wrap":       "#0D0D0D",
+        "sidebar_teks":       "#A1A1AA",
+        "sidebar_sub":        "#52525B",
+        "sidebar_hover":      "#2A1F14",
+        "sidebar_aktif":      "#EA580C",
+        "sidebar_card":       "#242424",
+        "sidebar_card_border":"#2E2E2E",
+        "sidebar_card_teks":  "#E5E5E5",
+        "sidebar_card_sub":   "#71717A",
+        "sidebar_avatar_bg":  "#2E2E2E",
+        "sidebar_logout_hover":"#2D0A0A",
+        # Topbar
+        "topbar_bg":    "#161616",
+        "notif_bg":     "#242424",
+        "profile_bg":   "#242424",
+        "topbar_teks":  "#E5E5E5",
+        "topbar_sub":   "#A1A1AA",
+        # Main
+        "main_bg":      "#161616",
+        "wrapper_bg":   "#161616",
+    },
 }
+
+# ── Objek C dinamis ───────────────────────────────────────────
+class _ColorProxy(dict):
+    """Dict yang nilainya bisa di-update live."""
+    pass
+
+C = _ColorProxy(_PALET["light"])
+
+# ── State tema ────────────────────────────────────────────────
+_tema_saat_ini = "light"
+
+def _terapkan_tema(mode: str, app_instance=None):
+    """Ubah tema secara global dan rebuild shell jika app diberikan."""
+    global _tema_saat_ini
+    _tema_saat_ini = mode
+    C.update(_PALET[mode])
+    ctk.set_appearance_mode(mode)
+    if app_instance is not None:
+        app_instance._rebuild_after_tema()
 
 F_JUDUL   = ("Segoe UI", 22, "bold")
 F_SUBJUDUL= ("Segoe UI", 14, "bold")
@@ -444,7 +530,7 @@ class Sidebar(ctk.CTkFrame):
         super().__init__(
             parent,
             width=260,
-            fg_color="#FFFFFF",
+            fg_color=C["sidebar_bg"],
             corner_radius=0
         )
 
@@ -490,14 +576,14 @@ class Sidebar(ctk.CTkFrame):
             kanan,
             text="SIAKAD",
             font=("Segoe UI", 22, "bold"),
-            text_color="#2B2B2B"
+            text_color=C["sidebar_card_teks"]
         ).pack(anchor="w")
 
         ctk.CTkLabel(
             kanan,
             text="Mahasiswa",
             font=("Segoe UI", 11),
-            text_color="#78716C"
+            text_color=C["sidebar_sub"]
         ).pack(anchor="w")
 
         # ====================================================
@@ -540,6 +626,12 @@ class Sidebar(ctk.CTkFrame):
         )
 
         self._menu_button(
+            "Mata Kuliah",
+            "matakuliah",
+            "📖"
+        )
+
+        self._menu_button(
             "Input Nilai",
             "nilai",
             "📝"
@@ -567,25 +659,126 @@ class Sidebar(ctk.CTkFrame):
 
         self._section("SISTEM")
 
+        self._menu_button(
+            "Pengaturan",
+            "pengaturan",
+            "⚙️"
+        )
+
+        # ── Tombol Logout (di bawah tulisan SISTEM) ────────────────────────
         logout = ctk.CTkButton(
             self.menu_scroll,
-            text="↪ Logout",
+            text="⎋  Logout",
             anchor="w",
             height=48,
             fg_color="transparent",
-            hover_color="#F5F5F5",
+            hover_color=C["sidebar_logout_hover"],
             text_color="#6B7280",
             font=("Segoe UI", 13),
             corner_radius=14,
             command=lambda: self._nav("logout")
         )
+        logout.pack(fill="x", padx=18, pady=(0, 16))
 
-        logout.pack(
-            side="bottom",
-            fill="x",
-            padx=18,
-            pady=24
+        # ── Spacer ─────────────────────────────────────────────────────────
+        ctk.CTkFrame(self.menu_scroll, height=4, fg_color="transparent").pack()
+
+        # ── Admin Profile Card (putih, border lembut) ──────────────────────
+        admin_card = ctk.CTkFrame(
+            self.menu_scroll,
+            fg_color=C["sidebar_card"],
+            corner_radius=14,
+            border_width=1,
+            border_color=C["sidebar_card_border"],
         )
+        admin_card.pack(fill="x", padx=18, pady=(0, 0))
+
+        admin_inner = ctk.CTkFrame(admin_card, fg_color="transparent")
+        admin_inner.pack(fill="x", padx=14, pady=12)
+
+        # Avatar — letakkan file di: assets/admin-avatar.png
+        try:
+            _av_img = ctk.CTkImage(
+                light_image=Image.open("assets/admin-avatar.png"),
+                dark_image=Image.open("assets/admin-avatar.png"),
+                size=(44, 44)
+            )
+            avatar_lbl = ctk.CTkLabel(admin_inner, image=_av_img, text="")
+        except Exception:
+            avatar_lbl = ctk.CTkLabel(
+                admin_inner,
+                text="👤",
+                font=("Segoe UI Emoji", 26),
+                fg_color=C["sidebar_avatar_bg"],
+                text_color=C["sidebar_teks"],
+                width=44, height=44,
+                corner_radius=22,
+            )
+        avatar_lbl.pack(side="left")
+
+        teks_admin = ctk.CTkFrame(admin_inner, fg_color="transparent")
+        teks_admin.pack(side="left", padx=10)
+
+        ctk.CTkLabel(
+            teks_admin,
+            text="Admin",
+            font=("Segoe UI", 13, "bold"),
+            text_color=C["sidebar_card_teks"],
+            anchor="w"
+        ).pack(anchor="w")
+
+        ctk.CTkLabel(
+            teks_admin,
+            text="Administrator",
+            font=("Segoe UI", 10),
+            text_color=C["sidebar_card_sub"],
+            anchor="w"
+        ).pack(anchor="w")
+
+        # ── Gambar Ilustrasi Full-Width (tanpa padding kiri/kanan) ─────────
+        # Letakkan file di: assets/sidebar-illustration.png
+        # Gambar akan di-stretch penuh ke lebar sidebar (260px)
+        deco_frame = ctk.CTkFrame(
+            self.menu_scroll,
+            fg_color="transparent",
+            corner_radius=0,
+        )
+        deco_frame.pack(fill="x", padx=0, pady=(8, 0))
+
+        try:
+            # Ukuran 260x140 — sesuaikan tinggi dengan proporsigambar Anda
+            _deco_img = ctk.CTkImage(
+                light_image=Image.open("assets/sidebar-illustration.png"),
+                dark_image=Image.open("assets/sidebar-illustration.png"),
+                size=(260, 140)
+            )
+            ctk.CTkLabel(
+                deco_frame,
+                image=_deco_img,
+                text="",
+                anchor="center"
+            ).pack(fill="x", padx=0, pady=0)
+        except Exception:
+            # Fallback bila gambar belum ada
+            fallback = ctk.CTkFrame(
+                deco_frame,
+                fg_color=C["oranye_muda"],
+                corner_radius=0,
+                height=110
+            )
+            fallback.pack(fill="x")
+            fallback.pack_propagate(False)
+            ctk.CTkLabel(
+                fallback,
+                text="📚🌿",
+                font=("Segoe UI Emoji", 32),
+            ).place(relx=0.5, rely=0.4, anchor="center")
+            ctk.CTkLabel(
+                fallback,
+                text="assets/sidebar-illustration.png",
+                font=("Segoe UI", 8),
+                text_color=C["oranye_gelap"],
+            ).place(relx=0.5, rely=0.82, anchor="center")
 
     def _section(self, text):
 
@@ -594,7 +787,7 @@ class Sidebar(ctk.CTkFrame):
                 self.menu_scroll,
                 text=text,
                 font=("Segoe UI", 11, "bold"),
-                text_color="#A1A1AA"
+                text_color=C["sidebar_sub"]
             ).pack(anchor="w", padx=36, pady=(22, 10))
 
     def _menu_button(self, text, key, icon):
@@ -605,8 +798,8 @@ class Sidebar(ctk.CTkFrame):
             anchor="w",
             height=52,
             fg_color="transparent",
-            hover_color="#FFF1E8",
-            text_color="#52525B",
+            hover_color=C["sidebar_hover"],
+            text_color=C["sidebar_teks"],
             font=("Segoe UI", 14),
             corner_radius=16,
             command=lambda k=key: self._klik(k)
@@ -622,14 +815,14 @@ class Sidebar(ctk.CTkFrame):
 
             b.configure(
                 fg_color="transparent",
-                text_color="#52525B",
+                text_color=C["sidebar_teks"],
                 font=("Segoe UI", 14)
             )
 
         if key in self._btns:
             self._btns[key].configure(
-                fg_color="#FF6B00",
-                hover_color="#FF6B00",
+                fg_color=C["sidebar_aktif"],
+                hover_color=C["sidebar_aktif"],
                 text_color="#FFFFFF",
                 font=("Segoe UI", 14, "bold")
             )
@@ -1126,7 +1319,6 @@ class HalamanDashboard(HalamanBase):
         self._render_top5(semua)
         self._render_tabel(semua)
 
-
 # ============================================================
 # HALAMAN DATA MAHASISWA
 # ============================================================
@@ -1520,7 +1712,6 @@ class HalamanMahasiswa(HalamanBase):
                 ctk.CTkLabel(row, text=f"{mk['nilai']:.0f}  /  {mk['grade']}",
                     font=("Segoe UI", 10, "bold"), text_color=C["oranye"]
                 ).pack(side="right", padx=10)
-
 
 # ============================================================
 # HALAMAN INPUT NILAI
@@ -2050,7 +2241,6 @@ class HalamanNilai(HalamanBase):
         )
         self._load_form()
 
-
 # ============================================================
 # HALAMAN STATISTIK — dengan grafik canvas
 # ============================================================
@@ -2368,63 +2558,273 @@ class HalamanStatistik(HalamanBase):
                          font=("Segoe UI", 22, "bold"),
                          text_color=color).pack(anchor="w")
 
-
 # ============================================================
 # HALAMAN RIWAYAT
 # ============================================================
 
 class HalamanRiwayat(HalamanBase):
+    """
+    Halaman Riwayat Aktivitas — desain modern dengan:
+    • 4 stat card di atas (Total Operasi, Operasi Terakhir, Dilakukan Oleh, Rentang Waktu)
+    • Tabel scrollable dengan kolom: dot, Waktu, Badge Aksi, Detail (icon+nama), chevron
+    """
+
+    # Mapping aksi → (label tampilan, warna latar badge, warna teks badge, emoji)
+    _AKSI_META = {
+        "TAMBAH": ("DATA MAHASISWA", "#D1FAE5", "#065F46", "➕"),
+        "HAPUS":  ("HAPUS DATA",     "#FEE2E2", "#991B1B", "🗑️"),
+        "EDIT":   ("EDIT KRS",       "#E0F2FE", "#0369A1", "✏️"),
+        "NILAI":  ("NILAI",          "#FFEDD5", "#9A3412", "📋"),
+        "LOGIN":  ("LOGIN",          "#F3E8FF", "#6B21A8", "🔐"),
+    }
 
     def __init__(self, parent):
         super().__init__(parent)
-        self._header("Riwayat Aktivitas", "20 operasi terakhir")
-        _style_tree()
         self._build()
 
     def _build(self):
-        toolbar = ctk.CTkFrame(self, fg_color="transparent")
-        toolbar.pack(fill="x", padx=28, pady=12)
-        _btn(toolbar, "Refresh", self.refresh, width=100).pack(side="right")
+        # ── Header baris (judul + tombol Refresh) ──────────────────────────
+        hdr = ctk.CTkFrame(self, fg_color="transparent")
+        hdr.pack(fill="x", padx=28, pady=(6, 0))
 
-        card = ctk.CTkFrame(self, fg_color=C["putih"],
-            corner_radius=12, border_width=1, border_color=C["abu_border"])
-        card.pack(fill="both", expand=True, padx=28, pady=(0, 24))
+        kiri = ctk.CTkFrame(hdr, fg_color="transparent")
+        kiri.pack(side="left")
 
-        cols = ("waktu", "aksi", "detail")
-        self._tree = ttk.Treeview(card, columns=cols, show="headings",
-            style="App.Treeview")
-        self._tree.heading("waktu",  text="Waktu",  anchor="center")
-        self._tree.heading("aksi",   text="Aksi",   anchor="center")
-        self._tree.heading("detail", text="Detail", anchor="w")
-        self._tree.column("waktu",  width=150, anchor="center")
-        self._tree.column("aksi",   width=90,  anchor="center")
-        self._tree.column("detail", width=450, anchor="w")
+        # Icon lingkaran oranye + jam
+        icon_wrap = ctk.CTkFrame(kiri, width=48, height=48,
+                                  corner_radius=12, fg_color=C["oranye_muda"])
+        icon_wrap.pack(side="left")
+        icon_wrap.pack_propagate(False)
+        ctk.CTkLabel(icon_wrap, text="🕐", font=("Segoe UI Emoji", 20)).place(
+            relx=0.5, rely=0.5, anchor="center")
 
-        self._tree.tag_configure("TAMBAH", foreground=C["hijau"])
-        self._tree.tag_configure("HAPUS",  foreground=C["merah"])
-        self._tree.tag_configure("NILAI",  foreground=C["oranye"])
-        self._tree.tag_configure("EDIT",   foreground=C["kuning"])
+        teks = ctk.CTkFrame(kiri, fg_color="transparent")
+        teks.pack(side="left", padx=12)
+        ctk.CTkLabel(teks, text="Riwayat Aktivitas",
+                     font=("Segoe UI", 22, "bold"),
+                     text_color=C["teks"]).pack(anchor="w")
+        ctk.CTkLabel(teks, text="20 operasi terakhir",
+                     font=F_KECIL, text_color=C["teks_sub"]).pack(anchor="w")
 
-        vsb = ttk.Scrollbar(card, orient="vertical", command=self._tree.yview)
-        self._tree.configure(yscrollcommand=vsb.set)
-        self._tree.pack(side="left", fill="both", expand=True, pady=1, padx=(1, 0))
-        vsb.pack(side="right", fill="y")
+        btn_refresh = ctk.CTkButton(
+            hdr, text="⟳  Refresh", command=self.refresh,
+            width=110, height=36,
+            font=("Segoe UI", 11, "bold"),
+            fg_color=C["oranye"], hover_color=C["oranye_gelap"],
+            corner_radius=10,
+        )
+        btn_refresh.pack(side="right")
+
+        # ── 4 Stat Card ────────────────────────────────────────────────────
+        stat_row = ctk.CTkFrame(self, fg_color="transparent")
+        stat_row.pack(fill="x", padx=28, pady=(14, 0))
+        stat_row.grid_columnconfigure((0, 1, 2, 3), weight=1, uniform="sc")
+
+        self._stat_vars = {
+            "total":    tk.StringVar(value="0"),
+            "terakhir": tk.StringVar(value="-"),
+            "operator": tk.StringVar(value="-"),
+            "rentang":  tk.StringVar(value="-"),
+        }
+
+        _kartu = [
+            ("total",    "📄", "Total Operasi",    "20 operasi terakhir"),
+            ("terakhir", "📅", "Operasi Terakhir", ""),
+            ("operator", "👤", "Dilakukan Oleh",   "Admin"),
+            ("rentang",  "▼",  "Rentang Waktu",    ""),
+        ]
+        for idx, (key, icon, judul, sub) in enumerate(_kartu):
+            self._buat_stat_card(stat_row, idx, key, icon, judul, sub)
+
+        # ── Tabel ──────────────────────────────────────────────────────────
+        tbl_wrap = ctk.CTkFrame(self, fg_color=C["putih"],
+                                 corner_radius=14,
+                                 border_width=1, border_color=C["abu_border"])
+        tbl_wrap.pack(fill="both", expand=True, padx=28, pady=(14, 24))
+
+        # Header tabel
+        hdr_tbl = ctk.CTkFrame(tbl_wrap, fg_color=C["putih"], height=42, corner_radius=0)
+        hdr_tbl.pack(fill="x", padx=0)
+        hdr_tbl.pack_propagate(False)
+
+        # Separator
+        sep = ctk.CTkFrame(tbl_wrap, height=1, fg_color=C["abu_border"], corner_radius=0)
+        sep.pack(fill="x")
+
+        _col_hdr = [
+            ("",       16,  "center"),
+            ("Waktu ⇅", 180, "w"),
+            ("Aksi",   160, "center"),
+            ("Detail", 999, "w"),
+        ]
+        for txt, w, anc in _col_hdr:
+            ctk.CTkLabel(hdr_tbl, text=txt,
+                         font=("Segoe UI", 10, "bold"),
+                         text_color=C["teks_sub"],
+                         anchor=anc,
+                         width=w if w < 999 else 0).pack(
+                side="left", padx=(16 if txt == "" else 4, 4))
+
+        # Scrollable body
+        self._scroll = ctk.CTkScrollableFrame(
+            tbl_wrap, fg_color=C["putih"],
+            corner_radius=0,
+            scrollbar_button_color=C["oranye_muda"],
+            scrollbar_button_hover_color=C["oranye"],
+        )
+        self._scroll.pack(fill="both", expand=True)
 
         self.refresh()
 
-    def refresh(self):
-        for i in self._tree.get_children():
-            self._tree.delete(i)
-        for h in db.get_riwayat():
-            self._tree.insert("", "end",
-                values=(h["waktu"], h["aksi"], h["detail"]),
-                tags=(h["aksi"],))
+    def _buat_stat_card(self, parent, col, key, icon, judul, sub):
+        card = ctk.CTkFrame(parent, fg_color=C["putih"],
+                             corner_radius=12,
+                             border_width=1, border_color=C["abu_border"])
+        card.grid(row=0, column=col, padx=(0 if col == 0 else 8, 0), pady=0, sticky="nsew")
 
+        inner = ctk.CTkFrame(card, fg_color="transparent")
+        inner.pack(fill="both", padx=16, pady=14)
+
+        top_r = ctk.CTkFrame(inner, fg_color="transparent")
+        top_r.pack(fill="x")
+
+        ctk.CTkLabel(top_r, text=judul,
+                     font=("Segoe UI", 10),
+                     text_color=C["teks_sub"],
+                     anchor="w").pack(side="left")
+
+        ic_box = ctk.CTkFrame(top_r, width=28, height=28,
+                               corner_radius=7, fg_color=C["oranye_muda"])
+        ic_box.pack(side="right")
+        ic_box.pack_propagate(False)
+        ctk.CTkLabel(ic_box, text=icon, font=("Segoe UI Emoji", 12)).place(
+            relx=0.5, rely=0.5, anchor="center")
+
+        ctk.CTkLabel(inner, textvariable=self._stat_vars[key],
+                     font=("Segoe UI", 18, "bold"),
+                     text_color=C["oranye"],
+                     anchor="w").pack(anchor="w", pady=(2, 0))
+
+        if sub:
+            ctk.CTkLabel(inner, text=sub,
+                         font=F_KECIL, text_color=C["teks_sub"],
+                         anchor="w").pack(anchor="w")
+
+    def _buat_baris(self, parent, data: dict, is_odd: bool):
+        aksi    = data.get("aksi", "")
+        waktu   = data.get("waktu", "")
+        detail  = data.get("detail", "")
+        op      = data.get("operator", "Admin")
+
+        meta    = self._AKSI_META.get(aksi, ("LAINNYA", C["abu_card"], C["teks_sub"], "📌"))
+        lbl_aksi, bg_badge, fg_badge, emoji = meta
+
+        row_bg  = "#FFF7ED" if is_odd else C["putih"]
+
+        row = ctk.CTkFrame(parent, fg_color=row_bg, corner_radius=0, height=58)
+        row.pack(fill="x")
+        row.pack_propagate(False)
+
+        # — Dot oranye —
+        dot_wrap = ctk.CTkFrame(row, fg_color="transparent", width=32)
+        dot_wrap.pack(side="left", fill="y", padx=(14, 0))
+        dot_wrap.pack_propagate(False)
+        ctk.CTkLabel(dot_wrap, text="●",
+                     font=("Segoe UI", 10),
+                     text_color=C["oranye"]).place(relx=0.5, rely=0.5, anchor="center")
+
+        # — Waktu (lebar tetap 180) —
+        wkt_box = ctk.CTkFrame(row, fg_color="transparent", width=180)
+        wkt_box.pack(side="left", fill="y", padx=(4, 0))
+        wkt_box.pack_propagate(False)
+
+        try:
+            tgl, jam = waktu.split(" ", 1)
+        except ValueError:
+            tgl, jam = waktu, ""
+
+        inner_wkt = ctk.CTkFrame(wkt_box, fg_color="transparent")
+        inner_wkt.place(relx=0, rely=0.5, anchor="w", x=4)
+
+        ctk.CTkLabel(inner_wkt, text=f"🕐  {waktu}",
+                     font=("Segoe UI", 10, "bold"),
+                     text_color=C["teks"],
+                     anchor="w").pack(anchor="w")
+        ctk.CTkLabel(inner_wkt, text=f"Hari ini, {jam} WIB",
+                     font=F_KECIL,
+                     text_color=C["teks_sub"],
+                     anchor="w").pack(anchor="w")
+
+        # — Badge Aksi (lebar tetap 160) —
+        badge_wrap = ctk.CTkFrame(row, fg_color="transparent", width=160)
+        badge_wrap.pack(side="left", fill="y", padx=4)
+        badge_wrap.pack_propagate(False)
+
+        badge = ctk.CTkFrame(badge_wrap, fg_color=bg_badge, corner_radius=8)
+        badge.place(relx=0.5, rely=0.5, anchor="center")
+        ctk.CTkLabel(badge,
+                     text=f"{emoji}  {lbl_aksi}",
+                     font=("Segoe UI", 10, "bold"),
+                     text_color=fg_badge).pack(padx=10, pady=4)
+
+        # — Detail —
+        det_box = ctk.CTkFrame(row, fg_color="transparent")
+        det_box.pack(side="left", fill="both", expand=True, padx=4)
+
+        inner_det = ctk.CTkFrame(det_box, fg_color="transparent")
+        inner_det.place(relx=0, rely=0.5, anchor="w", x=4)
+
+        ctk.CTkLabel(inner_det, text=f"👤  {op}",
+                     font=("Segoe UI", 10, "bold"),
+                     text_color=C["teks"],
+                     anchor="w").pack(anchor="w")
+        ctk.CTkLabel(inner_det, text=detail,
+                     font=F_KECIL,
+                     text_color=C["teks_sub"],
+                     anchor="w").pack(anchor="w")
+
+        # — Chevron —
+        ctk.CTkLabel(row, text="›",
+                     font=("Segoe UI", 18),
+                     text_color=C["teks_sub"]).pack(side="right", padx=14)
+
+        # — Separator tipis —
+        sep = ctk.CTkFrame(parent, height=1, fg_color=C["abu_border"], corner_radius=0)
+        sep.pack(fill="x")
+
+    def refresh(self):
+        # Hapus baris lama
+        for w in self._scroll.winfo_children():
+            w.destroy()
+
+        riwayat = db.get_riwayat()
+
+        # Hitung nilai stat card
+        total = len(riwayat)
+        terakhir = riwayat[0]["waktu"] if riwayat else "-"
+        try:
+            tgl_terakhir, jam_terakhir = terakhir.split(" ", 1)
+        except ValueError:
+            tgl_terakhir, jam_terakhir = terakhir, ""
+
+        self._stat_vars["total"].set(str(total))
+        self._stat_vars["terakhir"].set(tgl_terakhir)
+        self._stat_vars["operator"].set("1 Pengguna")
+        self._stat_vars["rentang"].set("Hari Ini")
+
+        if not riwayat:
+            ctk.CTkLabel(self._scroll,
+                         text="Belum ada riwayat aktivitas.",
+                         font=F_NORMAL,
+                         text_color=C["teks_sub"]).pack(pady=40)
+            return
+
+        for i, h in enumerate(riwayat):
+            self._buat_baris(self._scroll, h, is_odd=(i % 2 == 1))
 
 #============================================================
 #HALAMAN LOGIN - UPDATED UI
 #============================================================
-
 
 class HalamanLogin(ctk.CTkFrame):
 
@@ -3201,10 +3601,1059 @@ class HalamanJadwalAkademik(ctk.CTkFrame):
     def refresh(self):
         pass   # Tidak perlu fetch DB
 
+# ============================================================
+# HALAMAN MANAJEMEN MATA KULIAH
+# ============================================================
+
+class HalamanMataKuliah(HalamanBase):
+    """
+    Halaman Manajemen Mata Kuliah
+    — 4 stat card
+    — toolbar filter (search, status) + tombol Tambah
+    — tabel scrollable (Kode MK, Nama, SKS, Semester, Dosen, Status, Aksi)
+    — info tips bawah
+    — master scroll pada seluruh halaman
+    """
+
+    STATUS_LIST  = ["Semua", "Aktif", "Nonaktif"]
+    PER_HALAMAN  = 10
+
+    # Dosen pengampu sesuai foto (6 nama, abaikan Adli)
+    DOSEN_LIST = [
+        "Ibnu Hartopo, M.Pd.",
+        "Mariya Al Qibtiya, S.Si., M.T.",
+        "Nurul Fahmi Arief Hakim, S.Pd., M.T.",
+        "Resa Pramudita, S.Pd., M.T.",
+        "Roer Eka Pawinanto, S.Pd., M.Sc., Ph.D.",
+        "Silmi Ath Thahirah Al Azhima, S.T., M.T.",
+    ]
+
+    def __init__(self, parent):
+        super().__init__(parent)
+        self._halaman = 1
+        self._data_filter: list = []
+        self._build()
+
+    # ── Build UI ────────────────────────────────────────────────────────────
+    def _build(self):
+        # ── Master scroll untuk seluruh halaman ──────────────────────────────
+        self._master = ctk.CTkScrollableFrame(
+            self, fg_color="transparent",
+            scrollbar_button_color=C["oranye_muda"],
+            scrollbar_button_hover_color=C["oranye"])
+        self._master.pack(fill="both", expand=True)
+        body = self._master
+
+        # Header
+        hdr = ctk.CTkFrame(body, fg_color="transparent")
+        hdr.pack(fill="x", padx=28, pady=(6, 0))
+
+        kiri_hdr = ctk.CTkFrame(hdr, fg_color="transparent")
+        kiri_hdr.pack(side="left")
+        ctk.CTkLabel(kiri_hdr, text="Manajemen Mata Kuliah",
+                     font=("Segoe UI", 22, "bold"),
+                     text_color=C["teks"]).pack(anchor="w")
+        ctk.CTkLabel(kiri_hdr, text="Kelola data mata kuliah yang tersedia",
+                     font=F_KECIL, text_color=C["teks_sub"]).pack(anchor="w")
+
+        bc = ctk.CTkFrame(hdr, fg_color="transparent")
+        bc.pack(side="right")
+        ctk.CTkLabel(bc, text="🏠  /  Manajemen Mata Kuliah",
+                     font=F_KECIL, text_color=C["teks_sub"]).pack()
+
+        # ── 4 Stat Card ──────────────────────────────────────────────────────
+        stat_row = ctk.CTkFrame(body, fg_color="transparent")
+        stat_row.pack(fill="x", padx=28, pady=(14, 0))
+        stat_row.grid_columnconfigure((0, 1, 2, 3), weight=1, uniform="mk_sc")
+
+        self._sv = {
+            "total":     tk.StringVar(value="0"),
+            "sks":       tk.StringVar(value="0"),
+            "smt_aktif": tk.StringVar(value="-"),
+            "dosen":     tk.StringVar(value="0"),
+        }
+        _kartu = [
+            ("total",     "📖", "#FFF7ED", C["oranye"],  "Total Mata Kuliah", "Semua mata kuliah"),
+            ("sks",       "📚", "#F0FDF4", "#16A34A",   "Total SKS",          "Akumulasi SKS"),
+            ("smt_aktif", "📅", "#EFF6FF", "#1D4ED8",   "Semester Aktif",     "Sedang berjalan"),
+            ("dosen",     "👥", "#F5F3FF", "#7C3AED",   "Dosen Pengampu",     "Dosen terlibat"),
+        ]
+        for idx, (key, icon, bg, fg, judul, sub) in enumerate(_kartu):
+            self._buat_stat_mk(stat_row, idx, key, icon, bg, fg, judul, sub)
+
+        # ── Toolbar ──────────────────────────────────────────────────────────
+        toolbar = ctk.CTkFrame(body, fg_color=C["putih"],
+                                corner_radius=10,
+                                border_width=1, border_color=C["abu_border"])
+        toolbar.pack(fill="x", padx=28, pady=(14, 0))
+
+        tb_inner = ctk.CTkFrame(toolbar, fg_color="transparent")
+        tb_inner.pack(fill="x", padx=14, pady=10)
+
+        # Search
+        self._var_cari = tk.StringVar()
+        self._var_cari.trace_add("write", lambda *_: self._filter())
+        srch = ctk.CTkEntry(tb_inner, textvariable=self._var_cari,
+                             placeholder_text="🔍  Cari kode atau nama mata kuliah...",
+                             width=300, height=36, font=F_NORMAL,
+                             corner_radius=8, border_color=C["abu_border"],
+                             fg_color=C["putih"], text_color=C["teks"])
+        srch.pack(side="left", padx=(0, 16))
+
+        # Filter Status
+        self._var_status = tk.StringVar(value="Semua")
+        ctk.CTkLabel(tb_inner, text="Status", font=F_KECIL,
+                     text_color=C["teks_sub"]).pack(side="left")
+        ctk.CTkOptionMenu(tb_inner, variable=self._var_status,
+                           values=self.STATUS_LIST, width=130, height=36,
+                           font=F_NORMAL, fg_color=C["putih"],
+                           text_color=C["teks"], button_color=C["abu_border"],
+                           button_hover_color=C["oranye_muda"],
+                           dropdown_fg_color=C["putih"],
+                           command=lambda _: self._filter()).pack(side="left", padx=(6, 16))
+
+        # Tombol Tambah
+        ctk.CTkButton(tb_inner, text="＋  Tambah Mata Kuliah",
+                       command=self._dialog_tambah,
+                       height=36, font=("Segoe UI", 11, "bold"),
+                       fg_color=C["oranye"], hover_color=C["oranye_gelap"],
+                       corner_radius=8).pack(side="right")
+
+        # ── Tabel ────────────────────────────────────────────────────────────
+        tbl_card = ctk.CTkFrame(body, fg_color=C["putih"],
+                                 corner_radius=12,
+                                 border_width=1, border_color=C["abu_border"])
+        tbl_card.pack(fill="x", padx=28, pady=(10, 0))
+
+        # Header kolom (tanpa Prodi)
+        COL = [
+            ("Kode MK",         90,  "center"),
+            ("Nama Mata Kuliah", 260, "w"),
+            ("SKS",              60,  "center"),
+            ("Semester",         80,  "center"),
+            ("Dosen Pengampu",   230, "w"),
+            ("Status",           90,  "center"),
+            ("Aksi",             100, "center"),
+        ]
+        hdr_tbl = ctk.CTkFrame(tbl_card, fg_color="#F9FAFB",
+                                corner_radius=0, height=40)
+        hdr_tbl.pack(fill="x")
+        hdr_tbl.pack_propagate(False)
+        for txt, w, anc in COL:
+            ctk.CTkLabel(hdr_tbl, text=txt,
+                         font=("Segoe UI", 10, "bold"),
+                         text_color=C["teks_sub"],
+                         width=w, anchor=anc).pack(side="left", padx=6)
+
+        ctk.CTkFrame(tbl_card, height=1, fg_color=C["abu_border"]).pack(fill="x")
+
+        # Frame isi tabel — tidak perlu scrollable sendiri karena sudah ada master scroll
+        self._tbl_scroll = ctk.CTkFrame(
+            tbl_card, fg_color=C["putih"], corner_radius=0)
+        self._tbl_scroll.pack(fill="x")
+
+        # ── Footer pagination + info ──────────────────────────────────────────
+        footer = ctk.CTkFrame(body, fg_color="transparent")
+        footer.pack(fill="x", padx=28, pady=(6, 0))
+
+        self._lbl_info_pg = ctk.CTkLabel(footer, text="",
+                                          font=F_KECIL, text_color=C["teks_sub"],
+                                          anchor="w")
+        self._lbl_info_pg.pack(side="left")
+
+        pg_right = ctk.CTkFrame(footer, fg_color="transparent")
+        pg_right.pack(side="right")
+
+        self._btn_prev = ctk.CTkButton(pg_right, text="‹", width=36, height=32,
+                                        font=("Segoe UI", 14),
+                                        fg_color=C["putih"], text_color=C["teks"],
+                                        hover_color=C["oranye_muda"],
+                                        border_width=1, border_color=C["abu_border"],
+                                        corner_radius=6,
+                                        command=self._prev_page)
+        self._btn_prev.pack(side="left", padx=2)
+
+        self._pg_frame = ctk.CTkFrame(pg_right, fg_color="transparent")
+        self._pg_frame.pack(side="left")
+
+        self._btn_next = ctk.CTkButton(pg_right, text="›", width=36, height=32,
+                                        font=("Segoe UI", 14),
+                                        fg_color=C["putih"], text_color=C["teks"],
+                                        hover_color=C["oranye_muda"],
+                                        border_width=1, border_color=C["abu_border"],
+                                        corner_radius=6,
+                                        command=self._next_page)
+        self._btn_next.pack(side="left", padx=2)
+
+        # ── Info tips footer ──────────────────────────────────────────────────
+        self._buat_info_footer()
+
+        self.refresh()
+
+    def _buat_stat_mk(self, parent, col, key, icon, bg, fg, judul, sub):
+        card = ctk.CTkFrame(parent, fg_color=C["putih"],
+                             corner_radius=12,
+                             border_width=1, border_color=C["abu_border"])
+        card.grid(row=0, column=col, padx=(0 if col == 0 else 8, 0), sticky="nsew")
+
+        inner = ctk.CTkFrame(card, fg_color="transparent")
+        inner.pack(fill="both", padx=16, pady=12)
+
+        top = ctk.CTkFrame(inner, fg_color="transparent")
+        top.pack(fill="x")
+
+        ctk.CTkLabel(top, text=judul, font=("Segoe UI", 10),
+                     text_color=C["teks_sub"], anchor="w").pack(side="left")
+
+        ic = ctk.CTkFrame(top, width=30, height=30, corner_radius=8, fg_color=bg)
+        ic.pack(side="right")
+        ic.pack_propagate(False)
+        ctk.CTkLabel(ic, text=icon, font=("Segoe UI Emoji", 14)).place(
+            relx=0.5, rely=0.5, anchor="center")
+
+        ctk.CTkLabel(inner, textvariable=self._sv[key],
+                     font=("Segoe UI", 20, "bold"),
+                     text_color=fg, anchor="w").pack(anchor="w", pady=(2, 0))
+        ctk.CTkLabel(inner, text=sub, font=F_KECIL,
+                     text_color=C["teks_sub"], anchor="w").pack(anchor="w")
+
+    def _buat_info_footer(self):
+        wrap = ctk.CTkFrame(self._master, fg_color=C["putih"],
+                             corner_radius=12,
+                             border_width=1, border_color=C["abu_border"])
+        wrap.pack(fill="x", padx=28, pady=(8, 16))
+
+        inner = ctk.CTkFrame(wrap, fg_color="transparent")
+        inner.pack(fill="both", padx=16, pady=14)
+
+        # Baris atas: label Informasi
+        top_row = ctk.CTkFrame(inner, fg_color="transparent")
+        top_row.pack(fill="x")
+
+        dot = ctk.CTkFrame(top_row, width=10, height=10,
+                            corner_radius=5, fg_color=C["oranye"])
+        dot.pack(side="left", pady=2)
+        dot.pack_propagate(False)
+        ctk.CTkLabel(top_row, text="  Informasi",
+                     font=("Segoe UI", 11, "bold"),
+                     text_color=C["teks"]).pack(side="left")
+
+        content_row = ctk.CTkFrame(inner, fg_color="transparent")
+        content_row.pack(fill="x", pady=(10, 0))
+
+        tips = [
+            ("🎓", "Pastikan data mata kuliah sudah sesuai",
+             "Data yang akurat akan memudahkan proses input\nnilai dan laporan akademik."),
+            ("✅", "Kelola mata kuliah per semester",
+             "Atur semester dan SKS dengan benar agar\nperhitungan IPK akurat."),
+            ("👤", "Dosen pengampu",
+             "Setiap mata kuliah harus memiliki minimal\nsatu dosen pengampu."),
+        ]
+
+        # Kolom kiri untuk tips, kanan untuk gambar dekorasi
+        tips_col = ctk.CTkFrame(content_row, fg_color="transparent")
+        tips_col.pack(side="left", fill="both", expand=True)
+
+        for icon, judul, desk in tips:
+            item = ctk.CTkFrame(tips_col, fg_color="transparent")
+            item.pack(side="left", fill="y", padx=(0, 24))
+
+            ic_w = ctk.CTkFrame(item, width=32, height=32,
+                                 corner_radius=8, fg_color=C["oranye_muda"])
+            ic_w.pack(side="left", anchor="n", pady=2)
+            ic_w.pack_propagate(False)
+            ctk.CTkLabel(ic_w, text=icon,
+                         font=("Segoe UI Emoji", 14)).place(relx=0.5, rely=0.5, anchor="center")
+
+            txt = ctk.CTkFrame(item, fg_color="transparent")
+            txt.pack(side="left", padx=8)
+            ctk.CTkLabel(txt, text=judul, font=("Segoe UI", 10, "bold"),
+                         text_color=C["teks"], anchor="w").pack(anchor="w")
+            ctk.CTkLabel(txt, text=desk, font=F_KECIL,
+                         text_color=C["teks_sub"], anchor="w",
+                         justify="left").pack(anchor="w")
+
+        # Gambar dekorasi kanan — letakkan file di: assets/mk-illustration.png
+        deco_col = ctk.CTkFrame(content_row, fg_color="transparent", width=140)
+        deco_col.pack(side="right", fill="y")
+        deco_col.pack_propagate(False)
+
+        try:
+            _deco = ctk.CTkImage(
+                light_image=Image.open("assets/mk-illustration.png"),
+                dark_image=Image.open("assets/mk-illustration.png"),
+                size=(130, 80)
+            )
+            ctk.CTkLabel(deco_col, image=_deco, text="").place(
+                relx=1.0, rely=1.0, anchor="se")
+        except Exception:
+            ctk.CTkLabel(deco_col, text="📚🌿",
+                         font=("Segoe UI Emoji", 28),
+                         text_color=C["oranye"]).place(relx=0.5, rely=0.5, anchor="center")
+
+
+
+    # ── Filter & Pagination ─────────────────────────────────────────────────
+    def _filter(self):
+        semua  = db.get_semua_mk()
+        kw     = self._var_cari.get().lower().strip()
+        status = self._var_status.get()
+
+        hasil = semua
+        if kw:
+            hasil = [mk for mk in hasil
+                     if kw in mk["kode"].lower() or kw in mk["nama"].lower()
+                     or kw in mk.get("dosen", "").lower()]
+        if status != "Semua":
+            hasil = [mk for mk in hasil if mk.get("status") == status]
+
+        self._data_filter = hasil
+        self._halaman = 1
+        self._render_tabel()
+
+    def _render_tabel(self):
+        for w in self._tbl_scroll.winfo_children():
+            w.destroy()
+
+        data = self._data_filter
+        total = len(data)
+        total_pg = max(1, math.ceil(total / self.PER_HALAMAN))
+        self._halaman = max(1, min(self._halaman, total_pg))
+
+        start = (self._halaman - 1) * self.PER_HALAMAN
+        tampil = data[start: start + self.PER_HALAMAN]
+
+        end = min(start + self.PER_HALAMAN, total)
+        self._lbl_info_pg.configure(
+            text=f"Menampilkan {start+1}–{end} dari {total} mata kuliah" if total else "Tidak ada data")
+
+        # COL_W tanpa Prodi: Kode, Nama, SKS, Semester, Dosen, Status, Aksi
+        COL_W = [90, 260, 60, 80, 230, 90, 100]
+
+        if not tampil:
+            ctk.CTkLabel(self._tbl_scroll,
+                         text="Tidak ada mata kuliah yang sesuai filter.",
+                         font=F_NORMAL, text_color=C["teks_sub"]).pack(pady=30)
+        else:
+            for i, mk in enumerate(tampil):
+                self._buat_baris_mk(self._tbl_scroll, mk, i, COL_W)
+
+        # Render tombol pagination
+        for w in self._pg_frame.winfo_children():
+            w.destroy()
+        for pg in range(1, total_pg + 1):
+            is_aktif = pg == self._halaman
+            b = ctk.CTkButton(
+                self._pg_frame, text=str(pg), width=30, height=30,
+                font=("Segoe UI", 10, "bold") if is_aktif else ("Segoe UI", 10),
+                fg_color=C["oranye"] if is_aktif else C["putih"],
+                text_color=C["putih"] if is_aktif else C["teks"],
+                hover_color=C["oranye_muda"],
+                border_width=1, border_color=C["abu_border"],
+                corner_radius=6,
+                command=lambda p=pg: self._goto_page(p)
+            )
+            b.pack(side="left", padx=2)
+
+    def _buat_baris_mk(self, parent, mk: dict, idx: int, col_w: list):
+        bg = "#F9FAFB" if idx % 2 == 0 else C["putih"]
+        row = ctk.CTkFrame(parent, fg_color=bg, corner_radius=0, height=46)
+        row.pack(fill="x")
+        row.pack_propagate(False)
+
+        vals = [
+            mk.get("kode", ""),
+            mk.get("nama", ""),
+            str(mk.get("sks", "")),
+            str(mk.get("semester", "")),
+            mk.get("dosen", ""),
+        ]
+        anchors = ["center", "w", "center", "center", "w"]
+        for val, w, anc in zip(vals, col_w, anchors):
+            ctk.CTkLabel(row, text=val, font=F_NORMAL,
+                         text_color=C["teks"], width=w, anchor=anc,
+                         wraplength=w - 4).pack(side="left", padx=6)
+
+        # Badge status  (indeks 5 = kolom Status di COL_W)
+        st = mk.get("status", "Aktif")
+        st_bg = "#DCFCE7" if st == "Aktif" else "#FEE2E2"
+        st_fg = "#166534" if st == "Aktif" else "#991B1B"
+        badge = ctk.CTkFrame(row, fg_color=st_bg, corner_radius=6, width=col_w[5])
+        badge.pack(side="left", padx=6)
+        badge.pack_propagate(False)
+        ctk.CTkLabel(badge, text=st, font=("Segoe UI", 9, "bold"),
+                     text_color=st_fg).pack(padx=8, pady=3)
+
+        # Aksi buttons  (indeks 6 = kolom Aksi di COL_W)
+        aksi = ctk.CTkFrame(row, fg_color="transparent", width=col_w[6])
+        aksi.pack(side="left", padx=4)
+        aksi.pack_propagate(False)
+
+        kode = mk["kode"]
+        ctk.CTkButton(aksi, text="✏", width=26, height=26,
+                       font=("Segoe UI", 12), fg_color="transparent",
+                       text_color=C["teks_sub"], hover_color=C["oranye_muda"],
+                       corner_radius=6,
+                       command=lambda k=kode: self._dialog_edit(k)).pack(side="left", padx=2)
+        ctk.CTkButton(aksi, text="👁", width=26, height=26,
+                       font=("Segoe UI Emoji", 11), fg_color="transparent",
+                       text_color=C["teks_sub"], hover_color=C["oranye_muda"],
+                       corner_radius=6,
+                       command=lambda k=kode: self._dialog_detail(k)).pack(side="left", padx=2)
+        ctk.CTkButton(aksi, text="⋮", width=26, height=26,
+                       font=("Segoe UI", 14, "bold"), fg_color="transparent",
+                       text_color=C["teks_sub"], hover_color=C["oranye_muda"],
+                       corner_radius=6,
+                       command=lambda k=kode: self._menu_aksi(k)).pack(side="left", padx=2)
+
+        ctk.CTkFrame(parent, height=1, fg_color=C["abu_border"]).pack(fill="x")
+
+    # ── Pagination controls ─────────────────────────────────────────────────
+    def _goto_page(self, pg):
+        self._halaman = pg
+        self._render_tabel()
+
+    def _prev_page(self):
+        if self._halaman > 1:
+            self._halaman -= 1
+            self._render_tabel()
+
+    def _next_page(self):
+        total_pg = max(1, math.ceil(len(self._data_filter) / self.PER_HALAMAN))
+        if self._halaman < total_pg:
+            self._halaman += 1
+            self._render_tabel()
+
+    # ── Dialog Tambah ───────────────────────────────────────────────────────
+    def _dialog_tambah(self):
+        self._dialog_form("Tambah Mata Kuliah", None)
+
+    def _dialog_edit(self, kode: str):
+        self._dialog_form("Edit Mata Kuliah", kode)
+
+    def _dialog_form(self, judul: str, kode_edit):
+        existing = None
+        if kode_edit:
+            existing = next((mk for mk in db.get_semua_mk()
+                             if mk["kode"] == kode_edit), None)
+
+        dlg = ctk.CTkToplevel(self)
+        dlg.title(judul)
+        dlg.geometry("480x520")
+        dlg.resizable(False, False)
+        dlg.grab_set()
+
+        ctk.CTkLabel(dlg, text=judul,
+                     font=("Segoe UI", 16, "bold"),
+                     text_color=C["teks"]).pack(pady=(20, 4), padx=24, anchor="w")
+        ctk.CTkFrame(dlg, height=1, fg_color=C["abu_border"]).pack(fill="x", padx=24)
+
+        form = ctk.CTkScrollableFrame(dlg, fg_color="transparent")
+        form.pack(fill="both", expand=True, padx=24, pady=10)
+
+        def _field(label, placeholder, val="", show=""):
+            ctk.CTkLabel(form, text=label, font=F_KECIL,
+                         text_color=C["teks_sub"], anchor="w").pack(anchor="w", pady=(8, 2))
+            e = ctk.CTkEntry(form, placeholder_text=placeholder,
+                              show=show, width=400, height=36,
+                              font=F_NORMAL, corner_radius=8,
+                              border_color=C["abu_border"],
+                              fg_color=C["putih"], text_color=C["teks"])
+            if val:
+                e.insert(0, str(val))
+            e.pack(anchor="w")
+            return e
+
+        def _select(label, values, val=""):
+            ctk.CTkLabel(form, text=label, font=F_KECIL,
+                         text_color=C["teks_sub"], anchor="w").pack(anchor="w", pady=(8, 2))
+            var = tk.StringVar(value=val if val else values[0])
+            om = ctk.CTkOptionMenu(form, variable=var, values=values,
+                                    width=400, height=36, font=F_NORMAL,
+                                    fg_color=C["putih"], text_color=C["teks"],
+                                    button_color=C["abu_border"],
+                                    button_hover_color=C["oranye_muda"],
+                                    dropdown_fg_color=C["putih"])
+            om.pack(anchor="w")
+            return var
+
+        e_kode  = _field("Kode MK *", "Contoh: IF101",
+                          existing["kode"] if existing else "")
+        e_nama  = _field("Nama Mata Kuliah *", "Contoh: Pemrograman Dasar",
+                          existing["nama"] if existing else "")
+        e_sks   = _field("SKS *", "1–6", existing["sks"] if existing else "")
+        v_smt   = _select("Semester", [str(i) for i in range(1,9)],
+                           str(existing["semester"]) if existing else "1")
+        v_dosen = _select("Dosen Pengampu", self.DOSEN_LIST,
+                           existing.get("dosen", self.DOSEN_LIST[0]) if existing else self.DOSEN_LIST[0])
+        v_stat  = _select("Status", ["Aktif", "Nonaktif"],
+                           existing.get("status","Aktif") if existing else "Aktif")
+
+        if kode_edit:
+            e_kode.configure(state="disabled")
+
+        def _simpan():
+            try:
+                kode  = e_kode.get().strip()
+                nama  = e_nama.get().strip()
+                prodi = ""
+                sks   = int(e_sks.get())
+                smt   = int(v_smt.get())
+                dosen = v_dosen.get()
+                stat  = v_stat.get()
+                if kode_edit:
+                    db.edit_mk(kode_edit, nama, prodi, sks, smt, dosen, stat)
+                else:
+                    db.tambah_mk(kode, nama, prodi, sks, smt, dosen, stat)
+                dlg.destroy()
+                self.refresh()
+            except ValueError as exc:
+                messagebox.showerror("Error", str(exc), parent=dlg)
+
+        btn_row = ctk.CTkFrame(dlg, fg_color="transparent")
+        btn_row.pack(fill="x", padx=24, pady=(0, 20))
+        ctk.CTkButton(btn_row, text="Batal", width=100, height=36,
+                       fg_color=C["putih"], text_color=C["teks"],
+                       hover_color=C["abu_card"],
+                       border_width=1, border_color=C["abu_border"],
+                       corner_radius=8,
+                       command=dlg.destroy).pack(side="left")
+        ctk.CTkButton(btn_row, text="Simpan", width=100, height=36,
+                       fg_color=C["oranye"], hover_color=C["oranye_gelap"],
+                       corner_radius=8, font=("Segoe UI", 11, "bold"),
+                       command=_simpan).pack(side="right")
+
+    def _dialog_detail(self, kode: str):
+        mk = next((m for m in db.get_semua_mk() if m["kode"] == kode), None)
+        if not mk:
+            return
+        dlg = ctk.CTkToplevel(self)
+        dlg.title(f"Detail — {kode}")
+        dlg.geometry("400x340")
+        dlg.resizable(False, False)
+        dlg.grab_set()
+
+        ctk.CTkLabel(dlg, text=mk["nama"],
+                     font=("Segoe UI", 14, "bold"),
+                     text_color=C["teks"]).pack(pady=(18, 2), padx=20, anchor="w")
+        ctk.CTkFrame(dlg, height=1, fg_color=C["abu_border"]).pack(fill="x", padx=20)
+
+        rows = [
+            ("Kode MK",        mk["kode"]),
+            ("SKS",            str(mk.get("sks","-"))),
+            ("Semester",       str(mk.get("semester","-"))),
+            ("Dosen Pengampu", mk.get("dosen","-")),
+            ("Status",         mk.get("status","-")),
+        ]
+        for label, val in rows:
+            r = ctk.CTkFrame(dlg, fg_color="transparent")
+            r.pack(fill="x", padx=20, pady=3)
+            ctk.CTkLabel(r, text=label, font=F_KECIL,
+                         text_color=C["teks_sub"], width=130, anchor="w").pack(side="left")
+            ctk.CTkLabel(r, text=val, font=F_NORMAL,
+                         text_color=C["teks"], anchor="w").pack(side="left")
+
+        ctk.CTkButton(dlg, text="Tutup", width=100, height=34,
+                       fg_color=C["oranye"], hover_color=C["oranye_gelap"],
+                       corner_radius=8, command=dlg.destroy).pack(pady=18)
+
+    def _menu_aksi(self, kode: str):
+        mk = next((m for m in db.get_semua_mk() if m["kode"] == kode), None)
+        if not mk:
+            return
+        st = mk.get("status", "Aktif")
+        label_toggle = "Nonaktifkan" if st == "Aktif" else "Aktifkan"
+        jawab = messagebox.askyesnocancel(
+            "Aksi", f"Pilih aksi untuk {kode}:\n\nYes = {label_toggle}\nNo = Hapus\nCancel = Batal")
+        if jawab is True:
+            try:
+                db.toggle_status_mk(kode)
+                self.refresh()
+            except ValueError as e:
+                messagebox.showerror("Error", str(e))
+        elif jawab is False:
+            if messagebox.askyesno("Konfirmasi", f"Hapus mata kuliah {kode}?"):
+                try:
+                    db.hapus_mk(kode)
+                    self.refresh()
+                except ValueError as e:
+                    messagebox.showerror("Error", str(e))
+
+    # ── Refresh ─────────────────────────────────────────────────────────────
+    def refresh(self):
+        stat = db.statistik_mk()
+        self._sv["total"].set(str(stat["total"]))
+        self._sv["sks"].set(str(stat["total_sks"]))
+        self._sv["smt_aktif"].set(stat["smt_aktif"])
+        self._sv["dosen"].set(str(stat["dosen"]))
+        self._filter()
 
 # ============================================================
-# APLIKASI UTAMA
+# HALAMAN PENGATURAN
 # ============================================================
+
+class HalamanPengaturan(HalamanBase):
+    """
+    Halaman Pengaturan dengan dua tab:
+      • Profil Aplikasi — form info + pilihan tema + tentang
+      • Export Data     — export CSV mahasiswa, mata kuliah, nilai, ZIP
+    """
+
+    def __init__(self, parent, on_tema_change=None):
+        super().__init__(parent)
+        self._on_tema_change = on_tema_change
+        self._tab_aktif = "profil"
+        self._build()
+
+    # ─────────────────────────────────────────────────────────────────────────
+    # SHELL
+    # ─────────────────────────────────────────────────────────────────────────
+    def _build(self):
+        # ── Header judul ────────────────────────────────────────────────────
+        hdr = ctk.CTkFrame(self, fg_color="transparent", corner_radius=0)
+        hdr.pack(fill="x", padx=28, pady=(18, 0))
+        ctk.CTkLabel(hdr, text="Pengaturan", font=F_JUDUL,
+                     text_color=C["teks"]).pack(anchor="w")
+        ctk.CTkLabel(hdr, text="Kelola pengaturan dasar aplikasi",
+                     font=F_KECIL, text_color=C["teks_sub"]).pack(anchor="w")
+
+        # ── Tab bar ─────────────────────────────────────────────────────────
+        tab_wrap = ctk.CTkFrame(self, fg_color="transparent")
+        tab_wrap.pack(fill="x", padx=28, pady=(14, 0))
+
+        self._tab_btns = {}
+        tabs = [
+            ("profil",  "⚙️  Profil Aplikasi"),
+            ("export",  "⬇️  Export Data"),
+        ]
+        for key, label in tabs:
+            btn = ctk.CTkButton(
+                tab_wrap, text=label,
+                font=("Segoe UI", 12, "bold"),
+                height=36, corner_radius=8,
+                fg_color="transparent",
+                text_color=C["teks_sub"],
+                hover_color=C["abu_card"],
+                command=lambda k=key: self._buka_tab(k)
+            )
+            btn.pack(side="left", padx=(0, 4))
+            self._tab_btns[key] = btn
+
+        # Garis bawah tab
+        ctk.CTkFrame(self, height=1, fg_color=C["abu_border"]).pack(fill="x", pady=(6, 0))
+
+        # ── Area konten (satu frame per tab, toggle visibility) ─────────────
+        self._area_profil = ctk.CTkFrame(self, fg_color="transparent", corner_radius=0)
+        self._area_export = ctk.CTkFrame(self, fg_color="transparent", corner_radius=0)
+
+        self._build_profil(self._area_profil)
+        self._build_export(self._area_export)
+
+        # Tampilkan tab pertama
+        self._buka_tab("profil")
+
+    def _buka_tab(self, key: str):
+        self._tab_aktif = key
+
+        # Style tombol tab
+        for k, btn in self._tab_btns.items():
+            if k == key:
+                btn.configure(
+                    fg_color=C["oranye_muda"],
+                    text_color=C["oranye"],
+                    border_width=0,
+                )
+            else:
+                btn.configure(
+                    fg_color="transparent",
+                    text_color=C["teks_sub"],
+                    border_width=0,
+                )
+
+        # Toggle konten
+        self._area_profil.pack_forget()
+        self._area_export.pack_forget()
+        if key == "profil":
+            self._area_profil.pack(fill="both", expand=True)
+        else:
+            self._area_export.pack(fill="both", expand=True)
+
+    # ─────────────────────────────────────────────────────────────────────────
+    # TAB: PROFIL APLIKASI
+    # ─────────────────────────────────────────────────────────────────────────
+    def _build_profil(self, parent):
+        scroll = ctk.CTkScrollableFrame(parent, fg_color="transparent", corner_radius=0)
+        scroll.pack(fill="both", expand=True, padx=24, pady=16)
+
+        # ── Baris: Informasi Aplikasi + Tampilan ────────────────────────────
+        baris1 = ctk.CTkFrame(scroll, fg_color="transparent")
+        baris1.pack(fill="x", pady=(0, 16))
+        baris1.columnconfigure(0, weight=3)
+        baris1.columnconfigure(1, weight=2)
+
+        # Card Informasi Aplikasi
+        card_info = ctk.CTkFrame(baris1, fg_color=C["putih"], corner_radius=14,
+                                 border_width=1, border_color=C["abu_border"])
+        card_info.grid(row=0, column=0, sticky="nsew", padx=(0, 12))
+
+        self._card_section_header(card_info, "ℹ️", "Informasi Aplikasi", "Atur informasi dasar aplikasi.")
+        ctk.CTkFrame(card_info, height=1, fg_color=C["abu_border"]).pack(fill="x", padx=20, pady=4)
+
+        form = ctk.CTkFrame(card_info, fg_color="transparent")
+        form.pack(fill="x", padx=20, pady=(4, 20))
+
+        def _field(label, default):
+            ctk.CTkLabel(form, text=label, font=F_KECIL, text_color=C["teks_sub"],
+                         anchor="w").pack(fill="x", pady=(10, 2))
+            e = ctk.CTkEntry(form, height=38, corner_radius=8,
+                             font=F_NORMAL, border_color=C["abu_border"],
+                             fg_color=C["putih"], text_color=C["teks"])
+            e.insert(0, default)
+            e.pack(fill="x")
+            return e
+
+        self._e_nama  = _field("Nama Aplikasi",  "Sistem Informasi Akademik")
+        self._e_inst  = _field("Nama Institusi",  "Universitas Pendidikan Indonesia")
+        self._e_prodi = _field("Program Studi",   "Pendidikan Teknik Otomasi Industri dan Robotika")
+
+        ctk.CTkLabel(form, text="Alamat", font=F_KECIL,
+                     text_color=C["teks_sub"], anchor="w").pack(fill="x", pady=(10, 2))
+        self._e_alamat = ctk.CTkTextbox(form, height=70, corner_radius=8,
+                                        font=F_NORMAL, border_color=C["abu_border"],
+                                        fg_color=C["putih"], text_color=C["teks"],
+                                        border_width=2)
+        self._e_alamat.insert("1.0", "4HPV+G3F, Jl. Gegerkalong Girang Baru, Isola,\nKec. Sukasari, Kota Bandung, Jawa Barat 40154")
+        self._e_alamat.pack(fill="x")
+        ctk.CTkButton(form, text="Simpan Perubahan", height=38, corner_radius=8,
+                      font=("Segoe UI", 11, "bold"),
+                      fg_color=C["oranye"], hover_color=C["oranye_gelap"],
+                      command=self._simpan).pack(anchor="e", pady=(14, 0))
+
+        # Card Tampilan
+        card_tema = ctk.CTkFrame(baris1, fg_color=C["putih"], corner_radius=14,
+                                 border_width=1, border_color=C["abu_border"])
+        card_tema.grid(row=0, column=1, sticky="nsew")
+
+        self._card_section_header(card_tema, "🖥️", "Tampilan", "Pilih mode tampilan aplikasi.")
+        ctk.CTkFrame(card_tema, height=1, fg_color=C["abu_border"]).pack(fill="x", padx=20, pady=4)
+
+        tema_body = ctk.CTkFrame(card_tema, fg_color="transparent")
+        tema_body.pack(fill="x", padx=20, pady=(4, 20))
+
+        self._tema_var = tk.StringVar(value=_tema_saat_ini)
+
+        def _tema_card(label, deskripsi, ikon, nilai):
+            is_aktif = (_tema_saat_ini == nilai)
+            border_col = C["oranye"] if is_aktif else C["abu_border"]
+            bg_col = C["oranye_muda"] if is_aktif else C["putih"]
+            frame = ctk.CTkFrame(tema_body, fg_color=bg_col, corner_radius=10,
+                                 border_width=2, border_color=border_col)
+            frame.pack(fill="x", pady=6)
+            row = ctk.CTkFrame(frame, fg_color="transparent")
+            row.pack(fill="x", padx=10, pady=10)
+
+            rb = ctk.CTkRadioButton(
+                row, text="", variable=self._tema_var, value=nilai,
+                fg_color=C["oranye"], hover_color=C["oranye_aksen"],
+                border_color=C["abu_border"],
+                command=lambda v=nilai: self._ganti_tema(v)
+            )
+            rb.pack(side="left")
+
+            ctk.CTkLabel(row, text=ikon, font=("Segoe UI Emoji", 18)).pack(side="left", padx=(4, 6))
+
+            txt = ctk.CTkFrame(row, fg_color="transparent")
+            txt.pack(side="left", anchor="w")
+            ctk.CTkLabel(txt, text=label, font=("Segoe UI", 12, "bold"),
+                         text_color=C["teks"], anchor="w").pack(anchor="w")
+            ctk.CTkLabel(txt, text=deskripsi, font=F_KECIL,
+                         text_color=C["teks_sub"], anchor="w").pack(anchor="w")
+
+        _tema_card("Terang", "Gunakan tema terang", "☀️", "light")
+        _tema_card("Gelap",  "Gunakan tema gelap",  "🌙", "dark")
+
+        # ── Card: Tentang Aplikasi ───────────────────────────────────────────
+        card_tentang = ctk.CTkFrame(scroll, fg_color=C["putih"], corner_radius=14,
+                                    border_width=1, border_color=C["abu_border"])
+        card_tentang.pack(fill="x", pady=(0, 16))
+
+        self._card_section_header(card_tentang, "ℹ️", "Tentang Aplikasi",
+                                  "Informasi singkat tentang aplikasi.")
+        ctk.CTkFrame(card_tentang, height=1, fg_color=C["abu_border"]).pack(fill="x", padx=20, pady=4)
+
+        body_tent = ctk.CTkFrame(card_tentang, fg_color="transparent")
+        body_tent.pack(fill="x", padx=20, pady=(8, 18))
+
+        def _info_row(label, nilai):
+            row = ctk.CTkFrame(body_tent, fg_color="transparent")
+            row.pack(fill="x", pady=4)
+            ctk.CTkLabel(row, text=label, font=F_NORMAL, text_color=C["teks_sub"],
+                         anchor="w", width=200).pack(side="left")
+            ctk.CTkLabel(row, text=nilai, font=F_NORMAL, text_color=C["teks"],
+                         anchor="w").pack(side="left")
+
+        _info_row("Versi Aplikasi",    "v5.0.0")
+        _info_row("Dikembangkan Oleh", "Read Badar Al Mahi")
+        _info_row("Hak Cipta",         "© 2026 2507202 PTOIR-A 25'.")
+
+    # ─────────────────────────────────────────────────────────────────────────
+    # TAB: EXPORT DATA
+    # ─────────────────────────────────────────────────────────────────────────
+    def _build_export(self, parent):
+        scroll = ctk.CTkScrollableFrame(parent, fg_color="transparent", corner_radius=0)
+        scroll.pack(fill="both", expand=True, padx=24, pady=16)
+
+        # Header card
+        card_main = ctk.CTkFrame(scroll, fg_color=C["putih"], corner_radius=14,
+                                 border_width=1, border_color=C["abu_border"])
+        card_main.pack(fill="x", pady=(0, 16))
+
+        self._card_section_header(card_main, "⬇️", "Export Data",
+                                  "Export data sistem ke dalam file.")
+        ctk.CTkFrame(card_main, height=1, fg_color=C["abu_border"]).pack(fill="x", padx=20, pady=4)
+
+        # Info banner
+        banner = ctk.CTkFrame(card_main, fg_color="#EFF6FF", corner_radius=8,
+                              border_width=1, border_color="#BFDBFE")
+        banner.pack(fill="x", padx=20, pady=(8, 4))
+        ctk.CTkLabel(banner, text="ℹ️  Pilih jenis data yang ingin diexport. File akan diunduh ke perangkat Anda.",
+                     font=F_KECIL, text_color="#1D4ED8", anchor="w").pack(
+            padx=12, pady=8, anchor="w")
+
+        # Grid 4 kartu export
+        grid = ctk.CTkFrame(card_main, fg_color="transparent")
+        grid.pack(fill="x", padx=20, pady=(12, 20))
+        for i in range(4):
+            grid.columnconfigure(i, weight=1)
+
+        def _export_card(col, ikon, judul, deskripsi, warna_btn, warna_hover,
+                         warna_border, bg_ikon, label_btn, cmd):
+            card = ctk.CTkFrame(grid, fg_color=C["putih"], corner_radius=12,
+                                border_width=1, border_color=C["abu_border"])
+            card.grid(row=0, column=col, sticky="nsew", padx=6)
+
+            body = ctk.CTkFrame(card, fg_color="transparent")
+            body.pack(fill="x", padx=16, pady=16)
+
+            # Ikon bulat
+            ic = ctk.CTkFrame(body, fg_color=bg_ikon, corner_radius=24,
+                              width=48, height=48)
+            ic.pack(anchor="w")
+            ic.pack_propagate(False)
+            ctk.CTkLabel(ic, text=ikon, font=("Segoe UI Emoji", 20)).place(
+                relx=0.5, rely=0.5, anchor="center")
+
+            ctk.CTkLabel(body, text=judul, font=("Segoe UI", 12, "bold"),
+                         text_color=C["teks"], anchor="w").pack(anchor="w", pady=(10, 2))
+            ctk.CTkLabel(body, text=deskripsi, font=F_KECIL,
+                         text_color=C["teks_sub"], anchor="w", wraplength=170,
+                         justify="left").pack(anchor="w")
+
+            ctk.CTkFrame(card, height=1, fg_color=C["abu_border"]).pack(fill="x", padx=12)
+
+            btn_area = ctk.CTkFrame(card, fg_color="transparent")
+            btn_area.pack(fill="x", padx=12, pady=10)
+            ctk.CTkButton(btn_area, text=label_btn, height=34, corner_radius=8,
+                          font=("Segoe UI", 11, "bold"),
+                          fg_color=warna_btn, hover_color=warna_hover,
+                          text_color=warna_btn if warna_btn == "transparent" else "#FFFFFF",
+                          border_width=1 if warna_btn == "transparent" else 0,
+                          border_color=warna_border,
+                          command=cmd).pack(fill="x")
+
+        _export_card(
+            col=0, ikon="👥", judul="Data Mahasiswa",
+            deskripsi="Export seluruh data mahasiswa dalam format CSV (.csv)",
+            warna_btn=C["hijau"], warna_hover=_gelap(C["hijau"]),
+            warna_border=C["hijau"], bg_ikon=C["hijau_muda"],
+            label_btn="Export CSV", cmd=self._export_mahasiswa
+        )
+        _export_card(
+            col=1, ikon="🎓", judul="Data Mata Kuliah",
+            deskripsi="Export seluruh data mata kuliah dalam format CSV (.csv)",
+            warna_btn=C["oranye"], warna_hover=C["oranye_gelap"],
+            warna_border=C["oranye"], bg_ikon=C["oranye_muda"],
+            label_btn="Export CSV", cmd=self._export_matakuliah
+        )
+        _export_card(
+            col=2, ikon="📝", judul="Data Nilai",
+            deskripsi="Export seluruh data nilai mahasiswa dalam format CSV (.csv)",
+            warna_btn=C["ungu"], warna_hover=_gelap(C["ungu"]),
+            warna_border=C["ungu"], bg_ikon=C["ungu_muda"],
+            label_btn="Export CSV", cmd=self._export_nilai
+        )
+        _export_card(
+            col=3, ikon="📦", judul="Data Lengkap",
+            deskripsi="Export semua data (mahasiswa, mata kuliah, nilai) dalam satu file ZIP",
+            warna_btn=C["kuning"], warna_hover=_gelap(C["kuning"]),
+            warna_border=C["kuning"], bg_ikon=C["kuning_muda"],
+            label_btn="Export ZIP", cmd=self._export_zip
+        )
+
+    # ─────────────────────────────────────────────────────────────────────────
+    # HELPER UI
+    # ─────────────────────────────────────────────────────────────────────────
+    def _card_section_header(self, parent, ikon, judul, sub):
+        hdr = ctk.CTkFrame(parent, fg_color="transparent")
+        hdr.pack(fill="x", padx=20, pady=(18, 4))
+        ctk.CTkLabel(hdr, text=ikon, font=("Segoe UI Emoji", 18)).pack(side="left", padx=(0, 8))
+        txt = ctk.CTkFrame(hdr, fg_color="transparent")
+        txt.pack(side="left")
+        ctk.CTkLabel(txt, text=judul, font=("Segoe UI", 14, "bold"),
+                     text_color=C["teks"]).pack(anchor="w")
+        ctk.CTkLabel(txt, text=sub, font=F_KECIL,
+                     text_color=C["teks_sub"]).pack(anchor="w")
+
+    # ─────────────────────────────────────────────────────────────────────────
+    # LOGIKA EXPORT
+    # ─────────────────────────────────────────────────────────────────────────
+    def _export_mahasiswa(self):
+        import csv, os
+        from tkinter import filedialog
+        path = filedialog.asksaveasfilename(
+            defaultextension=".csv",
+            filetypes=[("CSV Files", "*.csv")],
+            initialfile="data_mahasiswa.csv",
+            title="Simpan Export Data Mahasiswa"
+        )
+        if not path:
+            return
+        try:
+            semua = db.get_semua()
+            with open(path, "w", newline="", encoding="utf-8-sig") as f:
+                writer = csv.writer(f)
+                writer.writerow(["NIM", "Nama", "Semester Terisi", "Total SKS", "IPK", "Predikat"])
+                for m in semua:
+                    ipk = db.ipk_mahasiswa(m)
+                    writer.writerow([
+                        m["nim"], m["nama"],
+                        db.semester_terisi(m),
+                        db.total_sks(m),
+                        f"{ipk:.2f}",
+                        db.predikat(ipk)
+                    ])
+            messagebox.showinfo("Sukses", f"Data mahasiswa berhasil diexport!\n{path}")
+        except Exception as e:
+            messagebox.showerror("Error", f"Gagal export: {e}")
+
+    def _export_matakuliah(self):
+        import csv
+        from tkinter import filedialog
+        path = filedialog.asksaveasfilename(
+            defaultextension=".csv",
+            filetypes=[("CSV Files", "*.csv")],
+            initialfile="data_matakuliah.csv",
+            title="Simpan Export Data Mata Kuliah"
+        )
+        if not path:
+            return
+        try:
+            semua_mk = db.get_semua_mk()
+            with open(path, "w", newline="", encoding="utf-8-sig") as f:
+                writer = csv.writer(f)
+                writer.writerow(["Kode", "Nama Mata Kuliah", "Program Studi", "SKS", "Semester", "Dosen", "Status"])
+                for mk in semua_mk:
+                    writer.writerow([
+                        mk["kode"], mk["nama"], mk.get("prodi", ""),
+                        mk["sks"], mk["semester"],
+                        mk.get("dosen", ""), mk.get("status", "Aktif")
+                    ])
+            messagebox.showinfo("Sukses", f"Data mata kuliah berhasil diexport!\n{path}")
+        except Exception as e:
+            messagebox.showerror("Error", f"Gagal export: {e}")
+
+    def _export_nilai(self):
+        import csv
+        from tkinter import filedialog
+        path = filedialog.asksaveasfilename(
+            defaultextension=".csv",
+            filetypes=[("CSV Files", "*.csv")],
+            initialfile="data_nilai.csv",
+            title="Simpan Export Data Nilai"
+        )
+        if not path:
+            return
+        try:
+            semua = db.get_semua()
+            with open(path, "w", newline="", encoding="utf-8-sig") as f:
+                writer = csv.writer(f)
+                writer.writerow(["NIM", "Nama Mahasiswa", "Semester", "Mata Kuliah", "SKS", "Nilai", "Grade"])
+                for m in semua:
+                    for smt_key, mks in m["semester"].items():
+                        for mk in mks:
+                            writer.writerow([
+                                m["nim"], m["nama"], smt_key,
+                                mk["nama"], mk["sks"], mk["nilai"], mk.get("grade", "")
+                            ])
+            messagebox.showinfo("Sukses", f"Data nilai berhasil diexport!\n{path}")
+        except Exception as e:
+            messagebox.showerror("Error", f"Gagal export: {e}")
+
+    def _export_zip(self):
+        import csv, zipfile, io
+        from tkinter import filedialog
+        path = filedialog.asksaveasfilename(
+            defaultextension=".zip",
+            filetypes=[("ZIP Files", "*.zip")],
+            initialfile="data_lengkap_siakad.zip",
+            title="Simpan Export Data Lengkap (ZIP)"
+        )
+        if not path:
+            return
+        try:
+            semua    = db.get_semua()
+            semua_mk = db.get_semua_mk()
+
+            def _csv_bytes(rows, header):
+                buf = io.StringIO()
+                w = csv.writer(buf)
+                w.writerow(header)
+                w.writerows(rows)
+                return buf.getvalue().encode("utf-8-sig")
+
+            # Mahasiswa
+            mhs_rows = []
+            for m in semua:
+                ipk = db.ipk_mahasiswa(m)
+                mhs_rows.append([m["nim"], m["nama"], db.semester_terisi(m),
+                                  db.total_sks(m), f"{ipk:.2f}", db.predikat(ipk)])
+
+            # Mata kuliah
+            mk_rows = [[mk["kode"], mk["nama"], mk.get("prodi",""), mk["sks"],
+                        mk["semester"], mk.get("dosen",""), mk.get("status","Aktif")]
+                       for mk in semua_mk]
+
+            # Nilai
+            nilai_rows = []
+            for m in semua:
+                for smt_key, mks in m["semester"].items():
+                    for mk in mks:
+                        nilai_rows.append([m["nim"], m["nama"], smt_key,
+                                           mk["nama"], mk["sks"], mk["nilai"], mk.get("grade","")])
+
+            with zipfile.ZipFile(path, "w", zipfile.ZIP_DEFLATED) as zf:
+                zf.writestr("data_mahasiswa.csv",
+                    _csv_bytes(mhs_rows, ["NIM","Nama","Semester Terisi","Total SKS","IPK","Predikat"]))
+                zf.writestr("data_matakuliah.csv",
+                    _csv_bytes(mk_rows, ["Kode","Nama Mata Kuliah","Program Studi","SKS","Semester","Dosen","Status"]))
+                zf.writestr("data_nilai.csv",
+                    _csv_bytes(nilai_rows, ["NIM","Nama Mahasiswa","Semester","Mata Kuliah","SKS","Nilai","Grade"]))
+
+            messagebox.showinfo("Sukses", f"Semua Data Berhasil Diexport dalam bentuk ZIP!\n{path}")
+        except Exception as e:
+            messagebox.showinfo("Error", f"Gagal export ZIP: {e}")
+            
+
+    # ─────────────────────────────────────────────────────────────────────────
+    # CALLBACKS
+    # ─────────────────────────────────────────────────────────────────────────
+    def _ganti_tema(self, mode: str):
+        if self._on_tema_change:
+            self._on_tema_change(mode)
+
+    def _simpan(self):
+        messagebox.showinfo("Sukses", "Perubahan informasi aplikasi berhasil disimpan!")
+
 
 class App(ctk.CTk):
 
@@ -3216,6 +4665,12 @@ class App(ctk.CTk):
         self.configure(fg_color=C["abu_bg"])
         _style_tree()
         self._tampil_login()
+
+    def _rebuild_after_tema(self):
+        """Dipanggil setelah tema diubah — rebuild shell dengan warna baru."""
+        self._bersih()
+        self._bangun_shell()
+        self._sidebar.aktifkan("pengaturan")
 
     def _tampil_login(self):
         self._bersih()
@@ -3233,7 +4688,7 @@ class App(ctk.CTk):
         # =====================================================
         wrapper = ctk.CTkFrame(
             self,
-            fg_color="#FFF8F3",
+            fg_color=C["wrapper_bg"],
             corner_radius=0
         )
         wrapper.pack(fill="both", expand=True)
@@ -3243,7 +4698,7 @@ class App(ctk.CTk):
         # =====================================================
         sidebar_wrap = ctk.CTkFrame(
             wrapper,
-            fg_color=C["oranye_gelap"],
+            fg_color=C["sidebar_wrap"],
             width=280,
             corner_radius=0
         )
@@ -3264,7 +4719,7 @@ class App(ctk.CTk):
         # =====================================================
         kanan = ctk.CTkFrame(
             wrapper,
-            fg_color="#FFF8F3",
+            fg_color=C["main_bg"],
             corner_radius=0
         )
         kanan.pack(side="left", fill="both", expand=True)
@@ -3275,7 +4730,7 @@ class App(ctk.CTk):
         topbar = ctk.CTkFrame(
             kanan,
             height=90,
-            fg_color="#FFF8F3",
+            fg_color=C["topbar_bg"],
             corner_radius=0
         )
         topbar.pack(fill="x", padx=30, pady=(18, 0))
@@ -3291,14 +4746,14 @@ class App(ctk.CTk):
             kiri,
             text="Dashboard Akademik",
             font=("Segoe UI", 28, "bold"),
-            text_color="#2B2B2B"
+            text_color=C["topbar_teks"]
         ).pack(anchor="w")
 
         ctk.CTkLabel(
             kiri,
             text="Kelola informasi akademik mahasiswa",
             font=("Segoe UI", 12),
-            text_color="#78716C"
+            text_color=C["topbar_sub"]
         ).pack(anchor="w")
 
         kanan_top = ctk.CTkFrame(
@@ -3312,7 +4767,7 @@ class App(ctk.CTk):
             width=48,
             height=48,
             corner_radius=24,
-            fg_color="#FFFFFF"
+            fg_color=C["notif_bg"]
         )
         notif.pack(side="right", padx=(10, 0))
         notif.pack_propagate(False)
@@ -3327,7 +4782,7 @@ class App(ctk.CTk):
             kanan_top,
             height=48,
             corner_radius=24,
-            fg_color="#FFFFFF"
+            fg_color=C["profile_bg"]
         )
         profile.pack(side="right", padx=10)
 
@@ -3335,7 +4790,7 @@ class App(ctk.CTk):
             profile,
             text="👨‍💻 Admin",
             font=("Segoe UI", 12, "bold"),
-            text_color="#2B2B2B"
+            text_color=C["topbar_teks"]
         ).pack(padx=18, pady=12)
 
         # =====================================================
@@ -3343,7 +4798,7 @@ class App(ctk.CTk):
         # =====================================================
         self._area = ctk.CTkFrame(
             kanan,
-            fg_color="#FFF8F3",
+            fg_color=C["main_bg"],
             corner_radius=0
         )
         self._area.pack(
@@ -3369,6 +4824,11 @@ class App(ctk.CTk):
         self._statistik = HalamanStatistik(self._area)
         self._riwayat = HalamanRiwayat(self._area)
         self._jadwal_akademik = HalamanJadwalAkademik(self._area)
+        self._matakuliah = HalamanMataKuliah(self._area)
+        self._pengaturan = HalamanPengaturan(
+            self._area,
+            on_tema_change=lambda m: _terapkan_tema(m, self)
+        )
 
         self._halaman_aktif = None
 
@@ -3386,6 +4846,8 @@ class App(ctk.CTk):
             "statistik":        self._statistik,
             "riwayat":          self._riwayat,
             "jadwal_akademik":  self._jadwal_akademik,
+            "matakuliah":       self._matakuliah,
+            "pengaturan":       self._pengaturan,
         }
 
         target = mapping.get(key)
@@ -3403,6 +4865,7 @@ class App(ctk.CTk):
         if key == "mahasiswa":   self._mhs.refresh()
         if key == "statistik":   self._statistik.refresh()
         if key == "riwayat":     self._riwayat.refresh()
+        if key == "matakuliah":  self._matakuliah.refresh()
 
     def _buka_nilai(self, nim: str):
         self._sidebar.aktifkan("nilai")
